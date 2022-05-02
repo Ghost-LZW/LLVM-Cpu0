@@ -94,7 +94,7 @@ Cpu0TargetMachine::Cpu0TargetMachine(const Target &T, const Triple &TT,
     : LLVMTargetMachine(T, computeDataLayout(TT, CPU, Options, isLittle), TT,
                         CPU, FS, Options, getEffectiveRelocModel(JIT, RM),
                         getEffectiveCodeModel(CM, CodeModel::Small), OL),
-      isLittle(isLittle), TLOF(llvm::make_unique<Cpu0TargetObjectFile>()),
+      isLittle(isLittle), TLOF(std::make_unique<Cpu0TargetObjectFile>()),
       ABI(Cpu0ABIInfo::computeTargetABI()),
       DefaultSubtarget(TT, CPU, FS, isLittle, *this) {
   initAsmInfo();

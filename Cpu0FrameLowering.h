@@ -18,7 +18,7 @@ protected:
   const Cpu0Subtarget &STI;
 
 public:
-  explicit Cpu0FrameLowering(const Cpu0Subtarget &sti, unsigned Alignment)
+  explicit Cpu0FrameLowering(const Cpu0Subtarget &sti, Align Alignment)
       : TargetFrameLowering(StackGrowsDown, Alignment, 0, Alignment), STI(sti) {
   }
 

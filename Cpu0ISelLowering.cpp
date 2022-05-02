@@ -12,7 +12,7 @@
 
 #include "Cpu0ISelLowering.h"
 
-#include "Cpu0MachineFunctionInfo.h"
+#include "Cpu0MachineFunction.h"
 #include "Cpu0Subtarget.h"
 #include "Cpu0TargetMachine.h"
 #include "Cpu0TargetObjectFile.h"

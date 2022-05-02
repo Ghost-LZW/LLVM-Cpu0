@@ -29,6 +29,40 @@ include "Cpu0Schedule.td"
 // Instruction Description
 include "Cpu0InstrInfo.td"
 
+// Calling Convention
+include "Cpu0CallingConv.td"
+
+//===----------------------------------------------------------------------===//
+// Cpu0 SUbtarget features
+//===----------------------------------------------------------------------===//
+
+def FeatureCmp            : SubtargetFeature<"cmp", "HasCmp", "true",
+                                             "Enable 'cmp' instructions.">;
+def FeatureSlt            : SubtargetFeature<"slt", "HasSlt", "true",
+                                             "Enable 'slt' instructions.">;
+def FeatureCpu032I        : SubtargetFeature<"cpu032I", "Cpu0ArchVersion",
+                                             "Cpu032I", "Cpu032I ISA Support",
+                                             [FeatureCmp]>;
+def FeatureCpu032II       : SubtargetFeature<"cpu032II", "Cpu0ArchVersion",
+                                             "Cpu032II", "Cpu032II ISA Support",
+                                             [FeatureCmp, FeatureSlt]>;
+
+//===----------------------------------------------------------------------===//
+// Cpu0 processors supported
+//===----------------------------------------------------------------------===//
+class Proc<string Name, list<SubtargetFeature> Features>
+  : Processor<Name, Cpu0GenericItineraries, Features>;
+
+def : Proc<"cpu032I", [FeatureCpu032I]>;
+def : Proc<"cpu032II", [FeatureCpu032II]>;
+// Above make Cpu0GenSubtargetInfo.inc set feature bit as the following order:
+// enum {
+//   FeatureCmp =  1ULL << 0,
+//   FeatureCpu032I =  1ULL << 1,
+//   FeatureCpu032II =  1ULL << 2,
+//   FeatureSlt =  1ULL << 3
+// };
+
 def Cpu0InstrInfo : InstrInfo;
 
 // Whill generate Cpu0GenAsmWrite.inc included by Cpu0InstPrinter.cpp, contents

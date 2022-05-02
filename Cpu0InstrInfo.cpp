@@ -11,7 +11,7 @@
 
 #include "Cpu0InstrInfo.h"
 
-#include "Cpu0MachineFunctionInfo.h"
+#include "Cpu0MachineFunction.h"
 #include "Cpu0TargetMachine.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/CodeGen/MachineBasicBlock.h"

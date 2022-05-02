@@ -12,7 +12,7 @@
 #include "Cpu0FrameLowering.h"
 
 #include "Cpu0InstrInfo.h"
-#include "Cpu0MachineFunctionInfo.h"
+#include "Cpu0MachineFunction.h"
 #include "Cpu0Subtarget.h"
 
 #include "llvm/CodeGen/MachineFrameInfo.h"
@@ -40,5 +40,5 @@ bool Cpu0FrameLowering::hasFP(const MachineFunction &MF) const {
 
   return MF.getTarget().Options.DisableFramePointerElim(MF) ||
          MFI.hasVarSizedObjects() || MFI.isFrameAddressTaken() ||
-         TRI->needsStackRealignment(MF);
+         TRI->hasStackRealignment(MF);
 }

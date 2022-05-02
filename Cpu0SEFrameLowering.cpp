@@ -11,7 +11,7 @@
 
 #include "Cpu0SEFrameLowering.h"
 
-#include "Cpu0MachineFunctionInfo.h"
+#include "Cpu0MachineFunction.h"
 #include "Cpu0SEInstrInfo.h"
 #include "Cpu0Subtarget.h"
 
@@ -46,7 +46,7 @@
 using namespace llvm;
 
 Cpu0SEFrameLowering::Cpu0SEFrameLowering(const Cpu0Subtarget &STI)
-    : Cpu0FrameLowering(STI, STI.stackAlignment()) {}
+    : Cpu0FrameLowering(STI, STI.getStackAlignment()) {}
 
 void Cpu0SEFrameLowering::emitPrologue(MachineFunction &MF,
                                        MachineBasicBlock &MBB) const {
