@@ -4,11 +4,10 @@
 //
 // This file is distributed under the University of Illinois Open Source
 // License. See LICENSE.TXT for details.
-
 //
 //===----------------------------------------------------------------------===//
 //
-// This fiel contains the Cpu0 implementation of the TargetInstrInfo class.
+// This file contains the Cpu0 implementation of the TargetInstrInfo class.
 //
 //===----------------------------------------------------------------------===//
 
@@ -16,7 +15,8 @@
 // Cpu0 profiles and nodes
 //===----------------------------------------------------------------------===//
 
-def SDT_Cpu0Ret : SDTypeProfile<0, 1, [SDTCisInt<0>]>;
+
+def SDT_Cpu0Ret          : SDTypeProfile<0, 1, [SDTCisInt<0>]>;
 
 // Return
 def Cpu0Ret : SDNode<"Cpu0ISD::Ret", SDTNone,
@@ -38,7 +38,6 @@ include "Cpu0InstrFormats.td"
 //===----------------------------------------------------------------------===//
 // Cpu0 Operand, Complex Patterns and Transformations Definitions
 //===----------------------------------------------------------------------===//
-
 // Instruction operand types
 
 // Signed Operand
@@ -49,7 +48,7 @@ def simm16 : Operand<i32> {
 // Address operand
 def mem : Operand<iPTR> {
   let PrintMethod = "printMemOperand";
-  let MIOperandInfo = (ops CPURegs, simm16);
+  let MIOperandInfo = (ops GPROut, simm16);
   let EncoderMethod = "getMemEncoding";
 }
 
@@ -57,10 +56,11 @@ def mem : Operand<iPTR> {
 // e.g. addi, andi
 def immSExt16 : PatLeaf<(imm), [{ return isInt<16>(N->getSExtValue()); }]>;
 
-// Cpu0 Address Mode! SDNode frameindex could posibily be a match since
-// load and store instructions from stack used it.
-def addr : ComplexPattern<iPTR, 2, "SelectAddr",
-                          [frameindex], [SDNPWantParent]>;
+
+// Cpu0 Address Mode! SDNode frameindex could possibily be a match
+// since load and store instructions from stack used it.
+def addr : 
+  ComplexPattern<iPTR, 2, "SelectAddr", [frameindex], [SDNPWantParent]>;
 
 //===----------------------------------------------------------------------===//
 // Pattern fragment for load/store
@@ -81,8 +81,8 @@ class AlignedStore<PatFrag Node>
             }]>;
 
 // Load/Store PatFrags
-def load_a  : AlignedLoad<load>;
-def store_a : AlignedStore<store>;
+def load_a          : AlignedLoad<load>;
+def store_a         : AlignedStore<store>;
 
 //===----------------------------------------------------------------------===//
 // Instructions specific format

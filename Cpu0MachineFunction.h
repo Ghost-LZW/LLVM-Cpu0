@@ -30,7 +30,7 @@ public:
 #if 0
     MF(MF),
 #endif
-        VarArgsFrameIndex(0)
+        VarArgsFrameIndex(0),
 #if 0 // CH >= CH3_4 //1
     , SRetReturnReg(0), CallsEhReturn(false), CallsEhDwarf(false),
 #endif
@@ -41,8 +41,8 @@ public:
     InArgFIRange(std::make_pair(-1, 0)),
     OutArgFIRange(std::make_pair(-1, 0)), GPFI(0), DynAllocFI(0),
 #endif
-#if 0 // CH >= CH3_2
-    EmitNOAT(false),
+        EmitNOAT(false)
+#if 0
     MaxCallFrameSize(0)
 #endif
   {
@@ -110,10 +110,8 @@ public:
   unsigned getMaxCallFrameSize() const { return MaxCallFrameSize; }
   void setMaxCallFrameSize(unsigned S) { MaxCallFrameSize = S; }
 #endif
-#if 0 // CH >= CH3_2
   bool getEmitNOAT() const { return EmitNOAT; }
   void setEmitNOAT() { EmitNOAT = true; }
-#endif
 
 #if 0 // CH >= CH9_2
   /// Create a MachinePointerInfo that has an ExternalSymbolPseudoSourceValue
@@ -180,11 +178,9 @@ private:
 #endif
 #if 0 // CH >= CH9_1 //5
   mutable int DynAllocFI; // Frame index of dynamically allocated stack area.
-#endif
-#if 0 // CH >= CH3_2
-  bool EmitNOAT;
   unsigned MaxCallFrameSize;
 #endif
+  bool EmitNOAT;
 };
 
 } // end of namespace llvm

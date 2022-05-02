@@ -1,25 +1,62 @@
 // Copyright 2022 All Rights Reserved.
 // Author: lanzongwei541@gmail.com (lanzongwei)
+//
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//===----------------------------------------------------------------------===//
+//
+// This file provides Cpu0 specific target descriptions.
+//
+//===----------------------------------------------------------------------===//
 
 #ifndef LLVM_LIB_TARGET_CPU0_MCTARGETDESC_CPU0MCTARGETDESC_H
 #define LLVM_LIB_TARGET_CPU0_MCTARGETDESC_CPU0MCTARGETDESC_H
 
 #include "llvm/Support/DataTypes.h"
 
+#include <memory>
+
 namespace llvm {
-  class Target;
-  class Triple;
+class MCAsmBackend;
+class MCCodeEmitter;
+class MCContext;
+class MCInstrInfo;
+class MCObjectTargetWriter;
+class MCRegisterInfo;
+class MCSubtargetInfo;
+class MCTargetOptions;
+class StringRef;
+class Target;
+class Triple;
+class raw_ostream;
+class raw_pwrite_stream;
 
-  Target &getTheCpu0Target();
-  Target &getTheCpu0elTarget();
-}
+Target &getTheCpu0Target();
+Target &getTheCpu0elTarget();
 
-// Defines symbolic names for Cpu0 registers. This defines a mapping from
-//  register name to register number.
+#if 0 // CH >= CH5_1
+MCCodeEmitter *createCpu0MCCodeEmitterEB(const MCInstrInfo &MCII,
+                                         const MCRegisterInfo &MRI,
+                                         MCContext &Ctx);
+MCCodeEmitter *createCpu0MCCodeEmitterEL(const MCInstrInfo &MCII,
+                                         const MCRegisterInfo &MRI,
+                                         MCContext &Ctx);
+
+MCAsmBackend *createCpu0AsmBackend(const Target &T,
+                                   const MCSubtargetInfo &STI,
+                                   const MCRegisterInfo &MRI,
+                                   const MCTargetOptions &Options);
+
+std::unique_ptr<MCObjectTargetWriter> createCpu0ELFObjectWriter(const Triple &TT);
+#endif
+} // namespace llvm
+
+// Defines symbolic names for Cpu0 registers.  This defines a mapping from
+// register name to register number.
 #define GET_REGINFO_ENUM
 #include "Cpu0GenRegisterInfo.inc"
 
-// Defines symbolic names for Cpu0 instructions.
+// Defines symbolic names for the Cpu0 instructions.
 #define GET_INSTRINFO_ENUM
 #include "Cpu0GenInstrInfo.inc"
 

@@ -21,6 +21,9 @@
 
 namespace llvm {
 
+Target &getTheCpu0Target();
+Target &getTheCpu0elTarget();
+
 class Cpu0TargetMachine : public LLVMTargetMachine {
   bool isLittle;
   std::unique_ptr<TargetLoweringObjectFile> TLOF;
