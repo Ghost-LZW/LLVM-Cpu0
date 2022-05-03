@@ -26,14 +26,8 @@ namespace llvm {
 class Cpu0FunctionInfo : public MachineFunctionInfo {
 public:
   Cpu0FunctionInfo(MachineFunction &MF)
-      :
-#if 0
-    MF(MF),
-#endif
-        VarArgsFrameIndex(0),
-#if 0 // CH >= CH3_4 //1
-    , SRetReturnReg(0), CallsEhReturn(false), CallsEhDwarf(false),
-#endif
+      : MF(MF), VarArgsFrameIndex(0), SRetReturnReg(0), CallsEhReturn(false),
+        CallsEhDwarf(false),
 #if 0 // CH >= CH6_1 //1
     GlobalBaseReg(0),
 #endif
@@ -41,11 +35,7 @@ public:
     InArgFIRange(std::make_pair(-1, 0)),
     OutArgFIRange(std::make_pair(-1, 0)), GPFI(0), DynAllocFI(0),
 #endif
-        EmitNOAT(false)
-#if 0
-    MaxCallFrameSize(0)
-#endif
-  {
+        EmitNOAT(false), MaxCallFrameSize(0) {
   }
 
   ~Cpu0FunctionInfo();
@@ -73,10 +63,8 @@ public:
   bool isDynAllocFI(int FI) const { return DynAllocFI && DynAllocFI == FI; }
 #endif
 
-#if 0 // CH >= CH3_4 //2
   unsigned getSRetReturnReg() const { return SRetReturnReg; }
   void setSRetReturnReg(unsigned Reg) { SRetReturnReg = Reg; }
-#endif
 
 #if 0 // CH >= CH6_1 //2
   bool globalBaseRegFixed() const;
@@ -87,15 +75,12 @@ public:
   int getVarArgsFrameIndex() const { return VarArgsFrameIndex; }
   void setVarArgsFrameIndex(int Index) { VarArgsFrameIndex = Index; }
 
-#if 0 // CH >= CH3_4 //3
   bool hasByvalArg() const { return HasByvalArg; }
   void setFormalArgInfo(unsigned Size, bool HasByval) {
     IncomingArgSize = Size;
     HasByvalArg = HasByval;
   }
-#endif
 
-#if 0 // CH >= CH3_5
   unsigned getIncomingArgSize() const { return IncomingArgSize; }
 
   bool callsEhReturn() const { return CallsEhReturn; }
@@ -109,7 +94,6 @@ public:
 
   unsigned getMaxCallFrameSize() const { return MaxCallFrameSize; }
   void setMaxCallFrameSize(unsigned S) { MaxCallFrameSize = S; }
-#endif
   bool getEmitNOAT() const { return EmitNOAT; }
   void setEmitNOAT() { EmitNOAT = true; }
 
@@ -126,21 +110,16 @@ public:
 private:
   virtual void anchor();
 
-#if 0
-  MachineFunction& MF;
-#endif
+  MachineFunction &MF;
 
   /// VarArgsFrameIndex - FrameIndex for start of varargs area.
   int VarArgsFrameIndex;
 
-#if 0 // CH >= CH3_4 //4
   /// SRetReturnReg - Some subtargets require that sret lowering includes
   /// returning the value of the returned struct in a register. This field
   /// holds the virtual register into which the sret argument is passed.
   unsigned SRetReturnReg;
-#endif
 
-#if 0 // CH >= CH3_4 //5
   /// True if function has a byval argument.
   bool HasByvalArg;
 
@@ -155,7 +134,6 @@ private:
 
   /// Frame objects for spilling eh data registers.
   int EhDataRegFI[2];
-#endif
 
 #if 0 // CH >= CH6_1 //3
   /// GlobalBaseReg - keeps track of the virtual register initialized for
@@ -178,9 +156,9 @@ private:
 #endif
 #if 0 // CH >= CH9_1 //5
   mutable int DynAllocFI; // Frame index of dynamically allocated stack area.
-  unsigned MaxCallFrameSize;
 #endif
   bool EmitNOAT;
+  unsigned MaxCallFrameSize;
 };
 
 } // end of namespace llvm

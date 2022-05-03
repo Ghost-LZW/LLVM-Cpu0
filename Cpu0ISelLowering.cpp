@@ -1632,7 +1632,6 @@ SDValue Cpu0TargetLowering::LowerFormalArguments(
     SDValue Chain, CallingConv::ID CallConv, bool IsVarArg,
     const SmallVectorImpl<ISD::InputArg> &Ins, const SDLoc &DL,
     SelectionDAG &DAG, SmallVectorImpl<SDValue> &InVals) const {
-#if 0 // H >= CH3_4
   MachineFunction &MF = DAG.getMachineFunction();
   MachineFrameInfo &MFI = MF.getFrameInfo();
   Cpu0FunctionInfo *Cpu0FI = MF.getInfo<Cpu0FunctionInfo>();
@@ -1641,11 +1640,9 @@ SDValue Cpu0TargetLowering::LowerFormalArguments(
 
   // Assign locations to all of the incoming arguments.
   SmallVector<CCValAssign, 16> ArgLocs;
-  CCState CCInfo(CallConv, IsVarArg, DAG.getMachineFunction(),
-                 ArgLocs, *DAG.getContext());
-  Cpu0CC Cpu0CCInfo(CallConv, ABI.IsO32(), 
-                    CCInfo);
-#endif
+  CCState CCInfo(CallConv, IsVarArg, DAG.getMachineFunction(), ArgLocs,
+                 *DAG.getContext());
+  Cpu0CC Cpu0CCInfo(CallConv, ABI.IsO32(), CCInfo);
 
 #if 0  // H >= CH9_1 //6
   const Function &Func = DAG.getMachineFunction().getFunction();
@@ -1655,10 +1652,8 @@ SDValue Cpu0TargetLowering::LowerFormalArguments(
 
   Cpu0CCInfo.analyzeFormalArguments(Ins, UseSoftFloat, FuncArg);
 #endif // #if CH >= CH9_1 //6
-#if 0  // H >= CH3_4
   Cpu0FI->setFormalArgInfo(CCInfo.getNextStackOffset(),
                            Cpu0CCInfo.hasByValArg());
-#endif
 
 #if 0 // H >= CH9_1 //6.3
   // Used with vargs to acumulate store chains.
@@ -1800,17 +1795,14 @@ Cpu0TargetLowering::LowerReturn(SDValue Chain, CallingConv::ID CallConv,
                                 const SmallVectorImpl<ISD::OutputArg> &Outs,
                                 const SmallVectorImpl<SDValue> &OutVals,
                                 const SDLoc &DL, SelectionDAG &DAG) const {
-#if 0 // H >= CH3_4 //in LowerReturn
   // CCValAssign - represent the assignment of
   // the return value to a location
   SmallVector<CCValAssign, 16> RVLocs;
   MachineFunction &MF = DAG.getMachineFunction();
 
   // CCState - Info about the registers and stack slot.
-  CCState CCInfo(CallConv, IsVarArg, MF, RVLocs,
-                 *DAG.getContext());
-  Cpu0CC Cpu0CCInfo(CallConv, ABI.IsO32(), 
-                    CCInfo);
+  CCState CCInfo(CallConv, IsVarArg, MF, RVLocs, *DAG.getContext());
+  Cpu0CC Cpu0CCInfo(CallConv, ABI.IsO32(), CCInfo);
 
   // Analyze return values.
   Cpu0CCInfo.analyzeReturn(Outs, Subtarget.abiUsesSoftFloat(),
@@ -1835,7 +1827,7 @@ Cpu0TargetLowering::LowerReturn(SDValue Chain, CallingConv::ID CallConv,
     RetOps.push_back(DAG.getRegister(VA.getLocReg(), VA.getLocVT()));
   }
 
-//@Ordinary struct type: 2 {
+  //@Ordinary struct type: 2 {
   // The cpu0 ABIs for returning structs by value requires that we copy
   // the sret argument into $v0 for the return. We saved the argument into
   // a virtual register in the entry block, so now we copy the value out
@@ -1854,9 +1846,9 @@ Cpu0TargetLowering::LowerReturn(SDValue Chain, CallingConv::ID CallConv,
     Flag = Chain.getValue(1);
     RetOps.push_back(DAG.getRegister(V0, getPointerTy(DAG.getDataLayout())));
   }
-//@Ordinary struct type: 2 }
+  //@Ordinary struct type: 2 }
 
-  RetOps[0] = Chain;  // Update chain.
+  RetOps[0] = Chain; // Update chain.
 
   // Add the flag if we have it.
   if (Flag.getNode())
@@ -1864,10 +1856,6 @@ Cpu0TargetLowering::LowerReturn(SDValue Chain, CallingConv::ID CallConv,
 
   // Return on Cpu0 is always a "ret $lr"
   return DAG.getNode(Cpu0ISD::Ret, DL, MVT::Other, RetOps);
-#else // #if CH >= CH3_4
-  return DAG.getNode(Cpu0ISD::Ret, DL, MVT::Other, Chain,
-                     DAG.getRegister(Cpu0::LR, MVT::i32));
-#endif
 }
 
 #if 0  // H >= CH11_2
@@ -2150,15 +2138,13 @@ Cpu0TargetLowering::Cpu0CC::SpecialCallingConvType
 }
 #endif
 
-#if 0 // H >= CH3_4
 Cpu0TargetLowering::Cpu0CC::Cpu0CC(
-  CallingConv::ID CC, bool IsO32_, CCState &Info,
-  Cpu0CC::SpecialCallingConvType SpecialCallingConv_)
-  : CCInfo(Info), CallConv(CC), IsO32(IsO32_) {
+    CallingConv::ID CC, bool IsO32_, CCState &Info,
+    Cpu0CC::SpecialCallingConvType SpecialCallingConv_)
+    : CCInfo(Info), CallConv(CC), IsO32(IsO32_) {
   // Pre-allocate reserved argument area.
   CCInfo.AllocateStack(reservedArgArea(), Align(1));
 }
-#endif
 
 #if 0 // H >= CH9_2 //6
 //@#if CH >= CH9_2 //6 {
@@ -2246,11 +2232,10 @@ analyzeFormalArguments(const SmallVectorImpl<ISD::InputArg> &Args,
 }
 #endif // #if CH >= CH9_1
 
-#if 0 // H >= CH3_4 //analyzeReturn
-template<typename Ty>
-void Cpu0TargetLowering::Cpu0CC::
-analyzeReturn(const SmallVectorImpl<Ty> &RetVals, bool IsSoftFloat,
-              const SDNode *CallNode, const Type *RetTy) const {
+template <typename Ty>
+void Cpu0TargetLowering::Cpu0CC::analyzeReturn(
+    const SmallVectorImpl<Ty> &RetVals, bool IsSoftFloat,
+    const SDNode *CallNode, const Type *RetTy) const {
   CCAssignFn *Fn;
 
   Fn = RetCC_Cpu0;
@@ -2270,18 +2255,17 @@ analyzeReturn(const SmallVectorImpl<Ty> &RetVals, bool IsSoftFloat,
   }
 }
 
-void Cpu0TargetLowering::Cpu0CC::
-analyzeCallResult(const SmallVectorImpl<ISD::InputArg> &Ins, bool IsSoftFloat,
-                  const SDNode *CallNode, const Type *RetTy) const {
+void Cpu0TargetLowering::Cpu0CC::analyzeCallResult(
+    const SmallVectorImpl<ISD::InputArg> &Ins, bool IsSoftFloat,
+    const SDNode *CallNode, const Type *RetTy) const {
   analyzeReturn(Ins, IsSoftFloat, CallNode, RetTy);
 }
 
-void Cpu0TargetLowering::Cpu0CC::
-analyzeReturn(const SmallVectorImpl<ISD::OutputArg> &Outs, bool IsSoftFloat,
-              const Type *RetTy) const {
+void Cpu0TargetLowering::Cpu0CC::analyzeReturn(
+    const SmallVectorImpl<ISD::OutputArg> &Outs, bool IsSoftFloat,
+    const Type *RetTy) const {
   analyzeReturn(Outs, IsSoftFloat, nullptr, RetTy);
 }
-#endif // #if CH >= CH3_4 //analyzeReturn
 
 #if 0  // H >= CH9_1 //8
 void Cpu0TargetLowering::Cpu0CC::handleByValArg(unsigned ValNo, MVT ValVT,
@@ -2312,11 +2296,9 @@ unsigned Cpu0TargetLowering::Cpu0CC::numIntArgRegs() const {
 }
 #endif // #if CH >= CH9_1
 
-#if 0 // H >= CH3_4 //reservedArgArea
 unsigned Cpu0TargetLowering::Cpu0CC::reservedArgArea() const {
   return (IsO32 && (CallConv != CallingConv::Fast)) ? 8 : 0;
 }
-#endif
 
 #if 0  // H >= CH9_1 //9
 const ArrayRef<MCPhysReg> Cpu0TargetLowering::Cpu0CC::intArgRegs() const {
@@ -2365,15 +2347,12 @@ void Cpu0TargetLowering::Cpu0CC::allocateRegs(ByValArgInfo &ByVal,
 }
 #endif
 
-#if 0 // H >= CH3_4 //getRegVT
-MVT Cpu0TargetLowering::Cpu0CC::getRegVT(MVT VT,
-                                         bool IsSoftFloat) const {
+MVT Cpu0TargetLowering::Cpu0CC::getRegVT(MVT VT, bool IsSoftFloat) const {
   if (IsSoftFloat || IsO32)
     return VT;
 
   return VT;
 }
-#endif
 
 #if 0 // H >= CH9_1 //11
 void Cpu0TargetLowering::

@@ -107,7 +107,6 @@ BitVector Cpu0RegisterInfo::getReservedRegs(const MachineFunction &MF) const {
 void Cpu0RegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator II,
                                            int SPAdj, unsigned FIOperandNum,
                                            RegScavenger *RS) const {
-#if 0 // CH >= CH3_5
   MachineInstr &MI = *II;
   MachineFunction &MF = *MI.getParent()->getParent();
   MachineFrameInfo &MFI = MF.getFrameInfo();
@@ -116,12 +115,12 @@ void Cpu0RegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator II,
   unsigned i = 0;
   while (!MI.getOperand(i).isFI()) {
     ++i;
-    assert(i < MI.getNumOperands() &&
-           "Instr doesn't have FrameIndex operand!");
+    assert(i < MI.getNumOperands() && "Instr doesn't have FrameIndex operand!");
   }
 
   LLVM_DEBUG(errs() << "\nFunction : " << MF.getFunction().getName() << "\n";
-             errs() << "<--------->\n" << MI);
+             errs() << "<--------->\n"
+                    << MI);
 
   int FrameIndex = MI.getOperand(i).getIndex();
   uint64_t stackSize = MF.getFrameInfo().getStackSize();
@@ -148,7 +147,7 @@ void Cpu0RegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator II,
   // getFrameRegister() returns.
   unsigned FrameReg;
 
-#if CH >= CH9_3 // 3
+#if 0 // CH >= CH9_3 // 3
   if (Cpu0FI->isOutArgFI(FrameIndex) || Cpu0FI->isDynAllocFI(FrameIndex) ||
       (FrameIndex >= MinCSFI && FrameIndex <= MaxCSFI))
     FrameReg = Cpu0::SP;
@@ -156,7 +155,7 @@ void Cpu0RegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator II,
     FrameReg = getFrameRegister(MF);
 #else
   FrameReg = Cpu0::SP;
-#endif                  //#if CH >= CH9_3 //3
+#endif //#if CH >= CH9_3 //3
 
   // Calculate final offset.
   // - There is no need to change the offset if the frame object is one of the
@@ -174,32 +173,24 @@ void Cpu0RegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator II,
   else
 #endif
 #endif //#if CH >= CH9_3 //1
-    Offset = spOffset + (int64_t)stackSize;
+  Offset = spOffset + (int64_t)stackSize;
 
-  Offset    += MI.getOperand(i+1).getImm();
+  Offset += MI.getOperand(i + 1).getImm();
 
-  LLVM_DEBUG(errs() << "Offset     : " << Offset << "\n" << "<--------->\n");
+  LLVM_DEBUG(errs() << "Offset     : " << Offset << "\n"
+                    << "<--------->\n");
 
   // If MI is not a debug value, make sure Offset fits in the 16-bit immediate
   // field.
   if (!MI.isDebugValue() && !isInt<16>(Offset)) {
-    errs() << "!!!ERROR!!! Not support large frame over 16-bit at this point.\n"
-           << "Though CH3_5 support it."
-           << "Reference: "
-               "http://jonathan2251.github.io/lbd/backendstructure.html#large-stack\n"
-           << "However the CH9_3, dynamic-stack-allocation-support bring instruction "
-              "move $fp, $sp that make it complicated in coding against the tutoral "
-              "purpose of Cpu0.\n"
-           << "Reference: "
-               "http://jonathan2251.github.io/lbd/funccall.html#dynamic-stack-allocation-support\n";
-    assert(0 && "(!MI.isDebugValue() && !isInt<16>(Offset))");
+    errs()
+        << "!!!ERROR!!! Not support large frame over 16-bit at this point.\n";
+    // assert(0 && "(!MI.isDebugValue() && !isInt<16>(Offset))");
   }
 
   MI.getOperand(i).ChangeToRegister(FrameReg, false);
-  MI.getOperand(i+1).ChangeToImmediate(Offset);
-#endif // #if CH >= CH3_5
+  MI.getOperand(i + 1).ChangeToImmediate(Offset);
 }
-//}
 
 bool Cpu0RegisterInfo::requiresRegisterScavenging(
     const MachineFunction &MF) const {

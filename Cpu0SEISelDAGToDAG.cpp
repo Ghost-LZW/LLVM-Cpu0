@@ -12,12 +12,10 @@
 #include "Cpu0SEISelDAGToDAG.h"
 
 #include "Cpu0.h"
-#include "MCTargetDesc/Cpu0BaseInfo.h"
-#if 0 // CH >= CH3_5
 #include "Cpu0AnalyzeImmediate.h"
-#endif
 #include "Cpu0MachineFunction.h"
 #include "Cpu0RegisterInfo.h"
+#include "MCTargetDesc/Cpu0BaseInfo.h"
 #include "llvm/CodeGen/MachineConstantPool.h"
 #include "llvm/CodeGen/MachineFrameInfo.h"
 #include "llvm/CodeGen/MachineFunction.h"

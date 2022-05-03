@@ -35,7 +35,6 @@ unsigned Cpu0FunctionInfo::getGlobalBaseReg() {
 }
 #endif
 
-#if 0 // CH >= CH3_5
 void Cpu0FunctionInfo::createEhDataRegsFI() {
   const TargetRegisterInfo &TRI = *MF.getSubtarget().getRegisterInfo();
   for (int I = 0; I < 2; ++I) {
@@ -45,7 +44,6 @@ void Cpu0FunctionInfo::createEhDataRegsFI() {
         TRI.getSpillSize(RC), TRI.getSpillAlign(RC), false);
   }
 }
-#endif
 
 #if 0 // CH >= CH9_2
 MachinePointerInfo Cpu0FunctionInfo::callPtrInfo(const char *ES) {

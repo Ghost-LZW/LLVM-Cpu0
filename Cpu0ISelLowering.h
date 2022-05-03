@@ -216,18 +216,14 @@ protected:
     ByValArgInfo() : FirstIdx(0), NumRegs(0), Address(0) {}
   };
 
-#if 0 // CH >= CH3_4
-    //@CH3_4 1 {
-    /// Cpu0CC - This class provides methods used to analyze formal and call
-    /// arguments and inquire about calling convention information.
-    class Cpu0CC {
-    public:
-      enum SpecialCallingConvType {
-        NoSpecialCallingConv
-      };
+  /// Cpu0CC - This class provides methods used to analyze formal and call
+  /// arguments and inquire about calling convention information.
+  class Cpu0CC {
+  public:
+    enum SpecialCallingConvType { NoSpecialCallingConv };
 
-      Cpu0CC(CallingConv::ID CallConv, bool IsO32, CCState &Info,
-             SpecialCallingConvType SpecialCallingConv = NoSpecialCallingConv);
+    Cpu0CC(CallingConv::ID CallConv, bool IsO32, CCState &Info,
+           SpecialCallingConvType SpecialCallingConv = NoSpecialCallingConv);
 
 #if 0 // CH >= CH9_2 //2
       void analyzeCallOperands(const SmallVectorImpl<ISD::OutputArg> &Outs,
@@ -241,17 +237,17 @@ protected:
                                   Function::const_arg_iterator FuncArg);
 #endif
 
-      void analyzeCallResult(const SmallVectorImpl<ISD::InputArg> &Ins,
-                             bool IsSoftFloat, const SDNode *CallNode,
-                             const Type *RetTy) const;
+    void analyzeCallResult(const SmallVectorImpl<ISD::InputArg> &Ins,
+                           bool IsSoftFloat, const SDNode *CallNode,
+                           const Type *RetTy) const;
 
-      void analyzeReturn(const SmallVectorImpl<ISD::OutputArg> &Outs,
-                         bool IsSoftFloat, const Type *RetTy) const;
+    void analyzeReturn(const SmallVectorImpl<ISD::OutputArg> &Outs,
+                       bool IsSoftFloat, const Type *RetTy) const;
 
-      const CCState &getCCInfo() const { return CCInfo; }
+    const CCState &getCCInfo() const { return CCInfo; }
 
-      /// hasByValArg - Returns true if function has byval arguments.
-      bool hasByValArg() const { return !ByValArgs.empty(); }
+    /// hasByValArg - Returns true if function has byval arguments.
+    bool hasByValArg() const { return !ByValArgs.empty(); }
 
 #if 0 // CH >= CH9_1 //2
       /// regSize - Size (in number of bits) of integer registers.
@@ -260,20 +256,20 @@ protected:
       unsigned numIntArgRegs() const;
 #endif
 
-      /// reservedArgArea - The size of the area the caller reserves for
-      /// register arguments. This is 16-byte if ABI is O32.
-      unsigned reservedArgArea() const;
+    /// reservedArgArea - The size of the area the caller reserves for
+    /// register arguments. This is 16-byte if ABI is O32.
+    unsigned reservedArgArea() const;
 
 #if 0 // CH >= CH9_1 //3
       /// Return pointer to array of integer argument registers.
       const ArrayRef<MCPhysReg> intArgRegs() const;
 #endif
 
-      typedef SmallVectorImpl<ByValArgInfo>::const_iterator byval_iterator;
-      byval_iterator byval_begin() const { return ByValArgs.begin(); }
-      byval_iterator byval_end() const { return ByValArgs.end(); }
+    typedef SmallVectorImpl<ByValArgInfo>::const_iterator byval_iterator;
+    byval_iterator byval_begin() const { return ByValArgs.begin(); }
+    byval_iterator byval_end() const { return ByValArgs.end(); }
 
-    private:
+  private:
 #if 0 // CH >= CH9_1 //4
       void handleByValArg(unsigned ValNo, MVT ValVT, MVT LocVT,
                           CCValAssign::LocInfo LocInfo,
@@ -297,23 +293,21 @@ protected:
                         unsigned Align);
 #endif
 
-      /// Return the type of the register which is used to pass an argument or
-      /// return a value. This function returns f64 if the argument is an i64
-      /// value which has been generated as a result of softening an f128 value.
-      /// Otherwise, it just returns VT.
-      MVT getRegVT(MVT VT, bool IsSoftFloat) const;
+    /// Return the type of the register which is used to pass an argument or
+    /// return a value. This function returns f64 if the argument is an i64
+    /// value which has been generated as a result of softening an f128 value.
+    /// Otherwise, it just returns VT.
+    MVT getRegVT(MVT VT, bool IsSoftFloat) const;
 
-      template<typename Ty>
-      void analyzeReturn(const SmallVectorImpl<Ty> &RetVals, bool IsSoftFloat,
-                         const SDNode *CallNode, const Type *RetTy) const;
+    template <typename Ty>
+    void analyzeReturn(const SmallVectorImpl<Ty> &RetVals, bool IsSoftFloat,
+                       const SDNode *CallNode, const Type *RetTy) const;
 
-      CCState &CCInfo;
-      CallingConv::ID CallConv;
-      bool IsO32;
-      SmallVector<ByValArgInfo, 2> ByValArgs;
-    };
-    //@CH3_4 1 }
-#endif // #if CH >= CH3_4
+    CCState &CCInfo;
+    CallingConv::ID CallConv;
+    bool IsO32;
+    SmallVector<ByValArgInfo, 2> ByValArgs;
+  };
 
 protected:
   // Subtarget Info
