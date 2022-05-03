@@ -32,6 +32,40 @@ const Cpu0InstrInfo *llvm::createCpu0SEInstrInfo(const Cpu0Subtarget &STI) {
   return new Cpu0SEInstrInfo(STI);
 }
 
+void Cpu0SEInstrInfo::copyPhysReg(MachineBasicBlock &MBB,
+                                  MachineBasicBlock::iterator I,
+                                  const DebugLoc &DL, MCRegister DestReg,
+                                  MCRegister SrcReg, bool KillSrc) const {
+  unsigned Opc = 0, ZeroReg = 0;
+
+  if (Cpu0::CPURegsRegClass.contains(DestReg)) { // Copy to CPU Reg.
+    if (Cpu0::CPURegsRegClass.contains(SrcReg))
+      Opc = Cpu0::ADDu, ZeroReg = Cpu0::ZERO;
+    else if (SrcReg == Cpu0::HI)
+      Opc = Cpu0::MFHI, SrcReg = 0;
+    else if (SrcReg == Cpu0::LO)
+      Opc = Cpu0::MFLO, SrcReg = 0;
+  } else if (Cpu0::CPURegsRegClass.contains(SrcReg)) { // Copy from CPU Reg.
+    if (DestReg == Cpu0::HI)
+      Opc = Cpu0::MTHI, DestReg = 0;
+    else if (DestReg == Cpu0::LO)
+      Opc = Cpu0::MTLO, DestReg = 0;
+  }
+
+  assert(Opc && "Cannot copy registers");
+
+  MachineInstrBuilder MIB = BuildMI(MBB, I, DL, get(Opc));
+
+  if (DestReg)
+    MIB.addReg(DestReg, RegState::Define);
+
+  if (ZeroReg)
+    MIB.addReg(ZeroReg);
+
+  if (SrcReg)
+    MIB.addReg(SrcReg, getKillRegState(KillSrc));
+}
+
 bool Cpu0SEInstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
   MachineBasicBlock &MBB = *MI.getParent();
 

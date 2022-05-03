@@ -12,10 +12,9 @@
 #ifndef LLVM_LIB_TARGET_CPU0_MCTARGETDESC_CPU0BASEINFO_H
 #define LLVM_LIB_TARGET_CPU0_MCTARGETDESC_CPU0BASEINFO_H
 
-#if 0 // CH >= CH5_1
 #include "Cpu0FixupKinds.h"
-#endif
 #include "Cpu0MCTargetDesc.h"
+
 #include "llvm/MC/MCExpr.h"
 #include "llvm/Support/DataTypes.h"
 #include "llvm/Support/ErrorHandling.h"

@@ -11,10 +11,8 @@
 
 #include "Cpu0InstPrinter.h"
 
-#if 0 // CH >= CH5_1 //1
-#include "Cpu0MCExpr.h"
-#endif
 #include "Cpu0InstrInfo.h"
+#include "Cpu0MCExpr.h"
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/MC/MCExpr.h"
 #include "llvm/MC/MCInst.h"

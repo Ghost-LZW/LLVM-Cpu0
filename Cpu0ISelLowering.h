@@ -95,9 +95,7 @@ public:
                            EVT VT) const override;
 #endif
 
-#if 0 // CH >= CH4_1
-    SDValue PerformDAGCombine(SDNode *N, DAGCombinerInfo &DCI) const override;
-#endif
+  SDValue PerformDAGCombine(SDNode *N, DAGCombinerInfo &DCI) const override;
 
 #if 0 // CH >= CH12_1 //2
     MachineBasicBlock *

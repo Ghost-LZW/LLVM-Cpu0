@@ -40,28 +40,24 @@ bool Cpu0SEDAGToDAGISel::runOnMachineFunction(MachineFunction &MF) {
   return Cpu0DAGToDAGISel::runOnMachineFunction(MF);
 }
 
-#if 0 // CH >= CH4_1 //1
 /// Select multiply instructions.
 std::pair<SDNode *, SDNode *>
 Cpu0SEDAGToDAGISel::selectMULT(SDNode *N, unsigned Opc, const SDLoc &DL, EVT Ty,
-                             bool HasLo, bool HasHi) {
+                               bool HasLo, bool HasHi) {
   SDNode *Lo = 0, *Hi = 0;
   SDNode *Mul = CurDAG->getMachineNode(Opc, DL, MVT::Glue, N->getOperand(0),
                                        N->getOperand(1));
   SDValue InFlag = SDValue(Mul, 0);
 
   if (HasLo) {
-    Lo = CurDAG->getMachineNode(Cpu0::MFLO, DL,
-                                Ty, MVT::Glue, InFlag);
+    Lo = CurDAG->getMachineNode(Cpu0::MFLO, DL, Ty, MVT::Glue, InFlag);
     InFlag = SDValue(Lo, 1);
   }
   if (HasHi)
-    Hi = CurDAG->getMachineNode(Cpu0::MFHI, DL,
-                                Ty, InFlag);
+    Hi = CurDAG->getMachineNode(Cpu0::MFHI, DL, Ty, InFlag);
 
   return std::make_pair(Lo, Hi);
 }
-#endif
 
 void Cpu0SEDAGToDAGISel::processFunctionAfterISel(MachineFunction &MF) {}
 
@@ -147,7 +143,6 @@ bool Cpu0SEDAGToDAGISel::trySelect(SDNode *Node) {
   }
 #endif
 
-#if 0 // CH >= CH4_1 //2
   case ISD::MULHS:
   case ISD::MULHU: {
     MultOpc = (Opcode == ISD::MULHU ? Cpu0::MULTu : Cpu0::MULT);
@@ -165,7 +160,6 @@ bool Cpu0SEDAGToDAGISel::trySelect(SDNode *Node) {
 
     return true;
   }
-#endif
   }
 
   return false;

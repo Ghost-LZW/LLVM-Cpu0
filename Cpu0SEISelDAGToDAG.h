@@ -33,11 +33,9 @@ private:
   // first MBB of the function.
   //  void initGlobalBaseReg(MachineFunction &MF);
 
-#if 0 // CH >= CH4_1
   std::pair<SDNode *, SDNode *> selectMULT(SDNode *N, unsigned Opc,
                                            const SDLoc &DL, EVT Ty, bool HasLo,
                                            bool HasHi);
-#endif
 
 #if 0 // CH >= CH7_1
   void selectAddESubE(unsigned MOp, SDValue InFlag, SDValue CmpLHS,

@@ -169,12 +169,10 @@ Cpu0TargetLowering::Cpu0TargetLowering(const Cpu0TargetMachine &TM,
   setOperationAction(ISD::ADD,                MVT::i32,   Custom);
 #endif
 
-#if 0 // H >= CH4_1 //1
   setOperationAction(ISD::SDIV, MVT::i32, Expand);
   setOperationAction(ISD::SREM, MVT::i32, Expand);
   setOperationAction(ISD::UDIV, MVT::i32, Expand);
   setOperationAction(ISD::UREM, MVT::i32, Expand);
-#endif
 
   // Operations not directly supported by Cpu0.
 #if 0 // H >= CH8_1 //5
@@ -191,14 +189,12 @@ Cpu0TargetLowering::Cpu0TargetLowering(const Cpu0TargetMachine &TM,
   setOperationAction(ISD::CTTZ_ZERO_UNDEF,   MVT::i32,   Expand);
   setOperationAction(ISD::CTLZ_ZERO_UNDEF,   MVT::i32,   Expand);
 #endif
-#if 0 // H >= CH4_2 //1.2
   // Cpu0 doesn't have sext_inreg, replace them with shl/sra.
-  setOperationAction(ISD::SIGN_EXTEND_INREG, MVT::i1 , Expand);
-  setOperationAction(ISD::SIGN_EXTEND_INREG, MVT::i8 , Expand);
-  setOperationAction(ISD::SIGN_EXTEND_INREG, MVT::i16 , Expand);
-  setOperationAction(ISD::SIGN_EXTEND_INREG, MVT::i32 , Expand);
-  setOperationAction(ISD::SIGN_EXTEND_INREG, MVT::Other , Expand);
-#endif
+  setOperationAction(ISD::SIGN_EXTEND_INREG, MVT::i1, Expand);
+  setOperationAction(ISD::SIGN_EXTEND_INREG, MVT::i8, Expand);
+  setOperationAction(ISD::SIGN_EXTEND_INREG, MVT::i16, Expand);
+  setOperationAction(ISD::SIGN_EXTEND_INREG, MVT::i32, Expand);
+  setOperationAction(ISD::SIGN_EXTEND_INREG, MVT::Other, Expand);
 
 #if 0 // H >= CH9_3 //2
   setOperationAction(ISD::DYNAMIC_STACKALLOC, MVT::i32,  Expand);
@@ -228,10 +224,8 @@ Cpu0TargetLowering::Cpu0TargetLowering(const Cpu0TargetMachine &TM,
   setOperationAction(ISD::BSWAP, MVT::i64, Expand);
 #endif
 
-#if 0 // H >= CH4_1 //2
   setTargetDAGCombine(ISD::SDIVREM);
   setTargetDAGCombine(ISD::UDIVREM);
-#endif
 
   //- Set .align 2
   // It will emit .align 2 later
@@ -257,8 +251,7 @@ EVT Cpu0TargetLowering::getSetCCResultType(const DataLayout &, LLVMContext &,
 }
 #endif
 
-#if 0 // H >= CH4_1 //3
-static SDValue performDivRemCombine(SDNode *N, SelectionDAG& DAG,
+static SDValue performDivRemCombine(SDNode *N, SelectionDAG &DAG,
                                     TargetLowering::DAGCombinerInfo &DCI,
                                     const Cpu0Subtarget &Subtarget) {
   if (DCI.isBeforeLegalizeOps())
@@ -267,19 +260,18 @@ static SDValue performDivRemCombine(SDNode *N, SelectionDAG& DAG,
   EVT Ty = N->getValueType(0);
   unsigned LO = Cpu0::LO;
   unsigned HI = Cpu0::HI;
-  unsigned Opc = N->getOpcode() == ISD::SDIVREM ? Cpu0ISD::DivRem :
-                                                  Cpu0ISD::DivRemU;
+  unsigned Opc =
+      N->getOpcode() == ISD::SDIVREM ? Cpu0ISD::DivRem : Cpu0ISD::DivRemU;
   SDLoc DL(N);
 
-  SDValue DivRem = DAG.getNode(Opc, DL, MVT::Glue,
-                               N->getOperand(0), N->getOperand(1));
+  SDValue DivRem =
+      DAG.getNode(Opc, DL, MVT::Glue, N->getOperand(0), N->getOperand(1));
   SDValue InChain = DAG.getEntryNode();
   SDValue InGlue = DivRem;
 
   // insert MFLO
   if (N->hasAnyUseOfValue(0)) {
-    SDValue CopyFromLo = DAG.getCopyFromReg(InChain, DL, LO, Ty,
-                                            InGlue);
+    SDValue CopyFromLo = DAG.getCopyFromReg(InChain, DL, LO, Ty, InGlue);
     DAG.ReplaceAllUsesOfValueWith(SDValue(N, 0), CopyFromLo);
     InChain = CopyFromLo.getValue(1);
     InGlue = CopyFromLo.getValue(2);
@@ -287,21 +279,21 @@ static SDValue performDivRemCombine(SDNode *N, SelectionDAG& DAG,
 
   // insert MFHI
   if (N->hasAnyUseOfValue(1)) {
-    SDValue CopyFromHi = DAG.getCopyFromReg(InChain, DL,
-                                            HI, Ty, InGlue);
+    SDValue CopyFromHi = DAG.getCopyFromReg(InChain, DL, HI, Ty, InGlue);
     DAG.ReplaceAllUsesOfValueWith(SDValue(N, 1), CopyFromHi);
   }
 
   return SDValue();
 }
 
-SDValue Cpu0TargetLowering::PerformDAGCombine(SDNode *N, DAGCombinerInfo &DCI)
-  const {
+SDValue Cpu0TargetLowering::PerformDAGCombine(SDNode *N,
+                                              DAGCombinerInfo &DCI) const {
   SelectionDAG &DAG = DCI.DAG;
   unsigned Opc = N->getOpcode();
 
   switch (Opc) {
-  default: break;
+  default:
+    break;
   case ISD::SDIVREM:
   case ISD::UDIVREM:
     return performDivRemCombine(N, DAG, DCI, Subtarget);
@@ -309,7 +301,6 @@ SDValue Cpu0TargetLowering::PerformDAGCombine(SDNode *N, DAGCombinerInfo &DCI)
 
   return SDValue();
 }
-#endif
 
 #if 0  // H >= CH6_1 //3
 SDValue Cpu0TargetLowering::
