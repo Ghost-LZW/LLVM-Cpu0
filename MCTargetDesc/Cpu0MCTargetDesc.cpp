@@ -12,9 +12,8 @@
 #include "Cpu0MCTargetDesc.h"
 #include "Cpu0InstPrinter.h"
 #include "Cpu0MCAsmInfo.h"
-#if 0 // CH >= CH5_1
 #include "Cpu0TargetStreamer.h"
-#endif
+
 #include "llvm/MC/MCELFStreamer.h"
 #include "llvm/MC/MCInstPrinter.h"
 #include "llvm/MC/MCInstrAnalysis.h"
@@ -114,14 +113,14 @@ static MCInstrAnalysis *createCpu0MCInstrAnalysis(const MCInstrInfo *Info) {
   return new Cpu0MCInstrAnalysis(Info);
 }
 
-#if 0 // CH >= CH5_1 //1
 static MCStreamer *createMCStreamer(const Triple &TT, MCContext &Context,
                                     std::unique_ptr<MCAsmBackend> &&MAB,
                                     std::unique_ptr<MCObjectWriter> &&OW,
                                     std::unique_ptr<MCCodeEmitter> &&Emitter,
                                     bool RelaxAll) {
   return createELFStreamer(Context, std::move(MAB), std::move(OW),
-                           std::move(Emitter), RelaxAll);;
+                           std::move(Emitter), RelaxAll);
+  ;
 }
 
 static MCTargetStreamer *createCpu0AsmTargetStreamer(MCStreamer &S,
@@ -130,7 +129,6 @@ static MCTargetStreamer *createCpu0AsmTargetStreamer(MCStreamer &S,
                                                      bool isVerboseAsm) {
   return new Cpu0TargetAsmStreamer(S, OS);
 }
-#endif
 
 extern "C" void LLVMInitializeCpu0TargetMC() {
   for (Target *T : {&getTheCpu0Target(), &getTheCpu0elTarget()}) {
@@ -143,8 +141,7 @@ extern "C" void LLVMInitializeCpu0TargetMC() {
     // Register the MC register info.
     TargetRegistry::RegisterMCRegInfo(*T, createCpu0MCRegisterInfo);
 
-#if 0 // CH >= CH5_1 //2
-     // Register the elf streamer.
+    // Register the elf streamer.
     TargetRegistry::RegisterELFStreamer(*T, createMCStreamer);
 
     // Register the asm target streamer.
@@ -152,7 +149,6 @@ extern "C" void LLVMInitializeCpu0TargetMC() {
 
     // Register the asm backend.
     TargetRegistry::RegisterMCAsmBackend(*T, createCpu0AsmBackend);
-#endif
 
     // Register the MC subtarget info.
     TargetRegistry::RegisterMCSubtargetInfo(*T, createCpu0MCSubtargetInfo);
@@ -162,12 +158,9 @@ extern "C" void LLVMInitializeCpu0TargetMC() {
     TargetRegistry::RegisterMCInstPrinter(*T, createCpu0MCInstPrinter);
   }
 
-#if 0 // CH >= CH5_1 //3
   // Register the MC Code Emitter
   TargetRegistry::RegisterMCCodeEmitter(getTheCpu0Target(),
                                         createCpu0MCCodeEmitterEB);
   TargetRegistry::RegisterMCCodeEmitter(getTheCpu0elTarget(),
                                         createCpu0MCCodeEmitterEL);
-
-#endif
 }

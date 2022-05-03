@@ -34,21 +34,17 @@ class raw_pwrite_stream;
 Target &getTheCpu0Target();
 Target &getTheCpu0elTarget();
 
-#if 0 // CH >= CH5_1
 MCCodeEmitter *createCpu0MCCodeEmitterEB(const MCInstrInfo &MCII,
-                                         const MCRegisterInfo &MRI,
                                          MCContext &Ctx);
 MCCodeEmitter *createCpu0MCCodeEmitterEL(const MCInstrInfo &MCII,
-                                         const MCRegisterInfo &MRI,
                                          MCContext &Ctx);
 
-MCAsmBackend *createCpu0AsmBackend(const Target &T,
-                                   const MCSubtargetInfo &STI,
+MCAsmBackend *createCpu0AsmBackend(const Target &T, const MCSubtargetInfo &STI,
                                    const MCRegisterInfo &MRI,
                                    const MCTargetOptions &Options);
 
-std::unique_ptr<MCObjectTargetWriter> createCpu0ELFObjectWriter(const Triple &TT);
-#endif
+std::unique_ptr<MCObjectTargetWriter>
+createCpu0ELFObjectWriter(const Triple &TT);
 } // namespace llvm
 
 // Defines symbolic names for Cpu0 registers.  This defines a mapping from
