@@ -165,13 +165,11 @@ void Cpu0DAGToDAGISel::Select(SDNode *Node) {
   SelectCode(Node);
 }
 
-#if 0 // CH >= CH11_2
 // inlineasm begin
-bool Cpu0DAGToDAGISel::
-SelectInlineAsmMemoryOperand(const SDValue &Op, unsigned ConstraintID,
-                             std::vector<SDValue> &OutOps) {
+bool Cpu0DAGToDAGISel::SelectInlineAsmMemoryOperand(
+    const SDValue &Op, unsigned ConstraintID, std::vector<SDValue> &OutOps) {
   // All memory constraints can at least accept raw pointers.
-  switch(ConstraintID) {
+  switch (ConstraintID) {
   default:
     llvm_unreachable("Unexpected asm memory constraint");
   case InlineAsm::Constraint_m:
@@ -181,4 +179,3 @@ SelectInlineAsmMemoryOperand(const SDValue &Op, unsigned ConstraintID,
   return true;
 }
 // inlineasm end
-#endif

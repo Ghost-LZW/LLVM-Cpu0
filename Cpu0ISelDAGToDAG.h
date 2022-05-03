@@ -72,11 +72,8 @@ private:
 
   virtual void processFunctionAfterISel(MachineFunction &MF) = 0;
 
-#if 0 // CH >= CH11_2
-  bool SelectInlineAsmMemoryOperand(const SDValue &Op,
-                                    unsigned ConstraintID,
+  bool SelectInlineAsmMemoryOperand(const SDValue &Op, unsigned ConstraintID,
                                     std::vector<SDValue> &OutOps) override;
-#endif
 };
 
 } // namespace llvm

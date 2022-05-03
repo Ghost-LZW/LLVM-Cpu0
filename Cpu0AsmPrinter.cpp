@@ -16,6 +16,7 @@
 #include "Cpu0InstrInfo.h"
 #include "MCTargetDesc/Cpu0BaseInfo.h"
 #include "MCTargetDesc/Cpu0InstPrinter.h"
+#include "MCTargetDesc/Cpu0MCAsmInfo.h"
 
 #include "llvm/ADT/SmallString.h"
 #include "llvm/ADT/StringRef.h"
@@ -370,19 +371,19 @@ void Cpu0AsmPrinter::emitStartOfAsmFile(Module &M) {
   }
 }
 
-#if 0  // CH >= CH11_2
 // Print out an operand for an inline asm expression.
 bool Cpu0AsmPrinter::PrintAsmOperand(const MachineInstr *MI, unsigned OpNum,
                                      const char *ExtraCode, raw_ostream &O) {
   // Does this asm operand have a single letter operand modifier?
   if (ExtraCode && ExtraCode[0]) {
-    if (ExtraCode[1] != 0) return true; // Unknown modifier.
+    if (ExtraCode[1] != 0)
+      return true; // Unknown modifier.
 
     const MachineOperand &MO = MI->getOperand(OpNum);
     switch (ExtraCode[0]) {
     default:
       // See if this is a generic print operand
-      return AsmPrinter::PrintAsmOperand(MI,OpNum, ExtraCode,O);
+      return AsmPrinter::PrintAsmOperand(MI, OpNum, ExtraCode, O);
     case 'X': // hex const int
       if ((MO.getType()) != MachineOperand::MO_Immediate)
         return true;
@@ -446,63 +447,75 @@ void Cpu0AsmPrinter::printOperand(const MachineInstr *MI, int opNum,
   if (MO.getTargetFlags())
     closeP = true;
 
-  switch(MO.getTargetFlags()) {
-  case Cpu0II::MO_GPREL:    O << "%gp_rel("; break;
-  case Cpu0II::MO_GOT_CALL: O << "%call16("; break;
-  case Cpu0II::MO_GOT:      O << "%got(";    break;
-  case Cpu0II::MO_ABS_HI:   O << "%hi(";     break;
-  case Cpu0II::MO_ABS_LO:   O << "%lo(";     break;
-  case Cpu0II::MO_GOT_HI16: O << "%got_hi16("; break;
-  case Cpu0II::MO_GOT_LO16: O << "%got_lo16("; break;
+  switch (MO.getTargetFlags()) {
+  case Cpu0II::MO_GPREL:
+    O << "%gp_rel(";
+    break;
+  case Cpu0II::MO_GOT_CALL:
+    O << "%call16(";
+    break;
+  // case Cpu0II::MO_GOT:      O << "%got(";    break;
+  case Cpu0II::MO_ABS_HI:
+    O << "%hi(";
+    break;
+  case Cpu0II::MO_ABS_LO:
+    O << "%lo(";
+    break;
+  case Cpu0II::MO_GOT_HI16:
+    O << "%got_hi16(";
+    break;
+  case Cpu0II::MO_GOT_LO16:
+    O << "%got_lo16(";
+    break;
   }
 
   switch (MO.getType()) {
-    case MachineOperand::MO_Register:
-      O << '$'
-        << StringRef(Cpu0InstPrinter::getRegisterName(MO.getReg())).lower();
-      break;
+  case MachineOperand::MO_Register:
+    O << '$'
+      << StringRef(Cpu0InstPrinter::getRegisterName(MO.getReg())).lower();
+    break;
 
-    case MachineOperand::MO_Immediate:
-      O << MO.getImm();
-      break;
+  case MachineOperand::MO_Immediate:
+    O << MO.getImm();
+    break;
 
-    case MachineOperand::MO_MachineBasicBlock:
-      O << *MO.getMBB()->getSymbol();
-      return;
+  case MachineOperand::MO_MachineBasicBlock:
+    O << *MO.getMBB()->getSymbol();
+    return;
 
-    case MachineOperand::MO_GlobalAddress:
-      O << *getSymbol(MO.getGlobal());
-      break;
+  case MachineOperand::MO_GlobalAddress:
+    O << *getSymbol(MO.getGlobal());
+    break;
 
-    case MachineOperand::MO_BlockAddress: {
-      MCSymbol *BA = GetBlockAddressSymbol(MO.getBlockAddress());
-      O << BA->getName();
-      break;
-    }
-
-    case MachineOperand::MO_ExternalSymbol:
-      O << *GetExternalSymbolSymbol(MO.getSymbolName());
-      break;
-
-    case MachineOperand::MO_JumpTableIndex:
-      O << MAI->getPrivateGlobalPrefix() << "JTI" << getFunctionNumber()
-        << '_' << MO.getIndex();
-      break;
-
-    case MachineOperand::MO_ConstantPoolIndex:
-      O << MAI->getPrivateGlobalPrefix() << "CPI"
-        << getFunctionNumber() << "_" << MO.getIndex();
-      if (MO.getOffset())
-        O << "+" << MO.getOffset();
-      break;
-
-    default:
-      llvm_unreachable("<unknown operand type>");
+  case MachineOperand::MO_BlockAddress: {
+    MCSymbol *BA = GetBlockAddressSymbol(MO.getBlockAddress());
+    O << BA->getName();
+    break;
   }
 
-  if (closeP) O << ")";
+  case MachineOperand::MO_ExternalSymbol:
+    O << *GetExternalSymbolSymbol(MO.getSymbolName());
+    break;
+
+  case MachineOperand::MO_JumpTableIndex:
+    O << MAI->getPrivateGlobalPrefix() << "JTI" << getFunctionNumber() << '_'
+      << MO.getIndex();
+    break;
+
+  case MachineOperand::MO_ConstantPoolIndex:
+    O << MAI->getPrivateGlobalPrefix() << "CPI" << getFunctionNumber() << "_"
+      << MO.getIndex();
+    if (MO.getOffset())
+      O << "+" << MO.getOffset();
+    break;
+
+  default:
+    llvm_unreachable("<unknown operand type>");
+  }
+
+  if (closeP)
+    O << ")";
 }
-#endif // #if CH >= CH11_2
 
 void Cpu0AsmPrinter::PrintDebugValueComment(const MachineInstr *MI,
                                             raw_ostream &OS) {

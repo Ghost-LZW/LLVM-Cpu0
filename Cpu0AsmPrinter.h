@@ -77,13 +77,11 @@ public:
   void emitFunctionEntryLabel() override;
   void emitFunctionBodyStart() override;
   void emitFunctionBodyEnd() override;
-#if 0 // CH >= CH11_2
   bool PrintAsmOperand(const MachineInstr *MI, unsigned OpNo,
                        const char *ExtraCode, raw_ostream &O) override;
   bool PrintAsmMemoryOperand(const MachineInstr *MI, unsigned OpNum,
                              const char *ExtraCode, raw_ostream &O) override;
   void printOperand(const MachineInstr *MI, int opNum, raw_ostream &O);
-#endif
   void emitStartOfAsmFile(Module &M) override;
   void PrintDebugValueComment(const MachineInstr *MI, raw_ostream &OS);
 };

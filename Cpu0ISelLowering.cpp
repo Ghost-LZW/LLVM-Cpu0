@@ -1849,27 +1849,26 @@ Cpu0TargetLowering::LowerReturn(SDValue Chain, CallingConv::ID CallConv,
   return DAG.getNode(Cpu0ISD::Ret, DL, MVT::Other, RetOps);
 }
 
-#if 0  // H >= CH11_2
 //===----------------------------------------------------------------------===//
 //                           Cpu0 Inline Assembly Support
 //===----------------------------------------------------------------------===//
 
 /// getConstraintType - Given a constraint letter, return the type of
 /// constraint it is for this target.
-Cpu0TargetLowering::ConstraintType 
-Cpu0TargetLowering::getConstraintType(StringRef Constraint) const
-{
+Cpu0TargetLowering::ConstraintType
+Cpu0TargetLowering::getConstraintType(StringRef Constraint) const {
   // Cpu0 specific constraints
   // GCC config/mips/constraints.md
   // 'c' : A register suitable for use in an indirect
   //       jump. This will always be $t9 for -mabicalls.
   if (Constraint.size() == 1) {
     switch (Constraint[0]) {
-      default : break;
-      case 'c':
-        return C_RegisterClass;
-      case 'R':
-        return C_Memory;
+    default:
+      break;
+    case 'c':
+      return C_RegisterClass;
+    case 'R':
+      return C_Memory;
     }
   }
   return TargetLowering::getConstraintType(Constraint);
@@ -1883,8 +1882,8 @@ Cpu0TargetLowering::getSingleConstraintMatchWeight(
     AsmOperandInfo &info, const char *constraint) const {
   ConstraintWeight weight = CW_Invalid;
   Value *CallOperandVal = info.CallOperandVal;
-    // If we don't have a value, we can't do a match,
-    // but allow it at the lowest weight.
+  // If we don't have a value, we can't do a match,
+  // but allow it at the lowest weight.
   if (!CallOperandVal)
     return CW_Default;
   Type *type = CallOperandVal->getType();
@@ -1918,9 +1917,9 @@ Cpu0TargetLowering::getSingleConstraintMatchWeight(
 /// into non-numeric and numeric parts (Prefix and Reg). The first boolean flag
 /// that is returned indicates whether parsing was successful. The second flag
 /// is true if the numeric part exists.
-static std::pair<bool, bool>
-parsePhysicalReg(const StringRef &C, std::string &Prefix,
-                 unsigned long long &Reg) {
+static std::pair<bool, bool> parsePhysicalReg(const StringRef &C,
+                                              std::string &Prefix,
+                                              unsigned long long &Reg) {
   if (C.front() != '{' || C.back() != '}')
     return std::make_pair(false, false);
 
@@ -1939,8 +1938,9 @@ parsePhysicalReg(const StringRef &C, std::string &Prefix,
                         true);
 }
 
-std::pair<unsigned, const TargetRegisterClass *> Cpu0TargetLowering::
-parseRegForInlineAsmConstraint(const StringRef &C, MVT VT) const {
+std::pair<unsigned, const TargetRegisterClass *>
+Cpu0TargetLowering::parseRegForInlineAsmConstraint(const StringRef &C,
+                                                   MVT VT) const {
   const TargetRegisterClass *RC;
   std::string Prefix;
   unsigned long long Reg;
@@ -1952,7 +1952,7 @@ parseRegForInlineAsmConstraint(const StringRef &C, MVT VT) const {
   if (!R.second)
     return std::make_pair(0U, nullptr);
 
- // Parse $0-$15.
+  // Parse $0-$15.
   assert(Prefix == "$");
   RC = getRegClassFor((VT == MVT::Other) ? MVT::i32 : VT);
 
@@ -1966,8 +1966,7 @@ parseRegForInlineAsmConstraint(const StringRef &C, MVT VT) const {
 std::pair<unsigned, const TargetRegisterClass *>
 Cpu0TargetLowering::getRegForInlineAsmConstraint(const TargetRegisterInfo *TRI,
                                                  StringRef Constraint,
-                                                 MVT VT) const
-{
+                                                 MVT VT) const {
   if (Constraint.size() == 1) {
     switch (Constraint[0]) {
     case 'r':
@@ -1977,7 +1976,7 @@ Cpu0TargetLowering::getRegForInlineAsmConstraint(const TargetRegisterInfo *TRI,
       if (VT == MVT::i64)
         return std::make_pair(0U, &Cpu0::CPURegsRegClass);
       // This will generate an error message
-      return std::make_pair(0u, static_cast<const TargetRegisterClass*>(0));
+      return std::make_pair(0u, static_cast<const TargetRegisterClass *>(0));
     case 'c': // register suitable for indirect jump
       if (VT == MVT::i32)
         return std::make_pair((unsigned)Cpu0::T9, &Cpu0::CPURegsRegClass);
@@ -1997,18 +1996,20 @@ Cpu0TargetLowering::getRegForInlineAsmConstraint(const TargetRegisterInfo *TRI,
 /// LowerAsmOperandForConstraint - Lower the specified operand into the Ops
 /// vector.  If it is invalid, don't add anything to Ops.
 void Cpu0TargetLowering::LowerAsmOperandForConstraint(SDValue Op,
-                                                     std::string &Constraint,
-                                                     std::vector<SDValue>&Ops,
-                                                     SelectionDAG &DAG) const {
+                                                      std::string &Constraint,
+                                                      std::vector<SDValue> &Ops,
+                                                      SelectionDAG &DAG) const {
   SDLoc DL(Op);
   SDValue Result;
 
   // Only support length 1 constraints for now.
-  if (Constraint.length() > 1) return;
+  if (Constraint.length() > 1)
+    return;
 
   char ConstraintLetter = Constraint[0];
   switch (ConstraintLetter) {
-  default: break; // This will fall through to the generic implementation
+  default:
+    break;  // This will fall through to the generic implementation
   case 'I': // Signed 16 bit constant
     // If this fails, the parent routine will give an error
     if (ConstantSDNode *C = dyn_cast<ConstantSDNode>(Op)) {
@@ -2044,7 +2045,7 @@ void Cpu0TargetLowering::LowerAsmOperandForConstraint(SDValue Op,
     if (ConstantSDNode *C = dyn_cast<ConstantSDNode>(Op)) {
       EVT Type = Op.getValueType();
       int64_t Val = C->getSExtValue();
-      if ((isInt<32>(Val)) && ((Val & 0xffff) == 0)){
+      if ((isInt<32>(Val)) && ((Val & 0xffff) == 0)) {
         Result = DAG.getTargetConstant(Val, DL, Type);
         break;
       }
@@ -2092,7 +2093,8 @@ void Cpu0TargetLowering::LowerAsmOperandForConstraint(SDValue Op,
 
 bool Cpu0TargetLowering::isLegalAddressingMode(const DataLayout &DL,
                                                const AddrMode &AM, Type *Ty,
-                                               unsigned AS, Instruction *I) const {
+                                               unsigned AS,
+                                               Instruction *I) const {
   // No global is ever allowed as a base.
   if (AM.BaseGV)
     return false;
@@ -2110,7 +2112,6 @@ bool Cpu0TargetLowering::isLegalAddressingMode(const DataLayout &DL,
 
   return true;
 }
-#endif // #if CH >= CH11_2
 
 #if 0 // H >= CH7_1 //4
 bool

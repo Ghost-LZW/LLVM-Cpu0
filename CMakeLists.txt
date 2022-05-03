@@ -1,6 +1,9 @@
 add_llvm_component_group(Cpu0)
 
-set(LLVM_TARGET_DEFINITIONS Cpu0.td)
+set(LLVM_TARGET_DEFINITIONS Cpu0Asm.td)
+tablegen(LLVM Cpu0GenAsmMatcher.inc -gen-asm-matcher)
+
+set(LLVM_TARGET_DEFINITIONS Cpu0Other.td)
 
 # Generate Cpu0GenRegisterInfo.inc and Cpu0GenInstrInfo.inc which included by
 #  your hand code C++ files.
@@ -47,6 +50,7 @@ add_llvm_target(Cpu0CodeGen
   MC
   Cpu0Desc
   Cpu0Info
+  Cpu0AsmParser
   SelectionDAG
   Support
   Target
@@ -59,3 +63,4 @@ add_llvm_target(Cpu0CodeGen
 # Should match with "subdirectories = MCTargetDesc TargetInfo" in LLVMBuild.txt
 add_subdirectory(TargetInfo)
 add_subdirectory(MCTargetDesc)
+add_subdirectory(AsmParser)

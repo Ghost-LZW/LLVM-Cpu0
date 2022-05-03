@@ -11,17 +11,8 @@
 //===----------------------------------------------------------------------===//
 
 //===----------------------------------------------------------------------===//
-// Target-independent interfaces
-//===----------------------------------------------------------------------===//
-
-include "llvm/Target/Target.td"
-
-//===----------------------------------------------------------------------===//
 // Target-dependent interfaces
 //===----------------------------------------------------------------------===//
-
-// Register Infomation
-include "Cpu0RegisterInfo.td"
 
 // Calling Conversion
 include "Cpu0Schedule.td"
@@ -63,6 +54,17 @@ def : Proc<"cpu032II", [FeatureCpu032II]>;
 //   FeatureSlt =  1ULL << 3
 // };
 
+def Cpu0AsmParser : AsmParser {
+  let ShouldEmitMatchRegisterName = 0;
+}
+
+def Cpu0AsmParserVariant : AsmParserVariant {
+  int Variant = 0;
+
+  // Recognize hard coded registers.
+  string RegisterPrefix = "$";
+}
+
 def Cpu0InstrInfo : InstrInfo;
 
 // Whill generate Cpu0GenAsmWrite.inc included by Cpu0InstPrinter.cpp, contents
@@ -72,4 +74,6 @@ def Cpu0InstrInfo : InstrInfo;
 def Cpu0 : Target {
   // def Cpu0InstrInfo : InstrInfo as before.
   let InstructionSet = Cpu0InstrInfo;
+  let AssemblyParsers = [Cpu0AsmParser];
+  let AssemblyParserVariants = [Cpu0AsmParserVariant];
 }
