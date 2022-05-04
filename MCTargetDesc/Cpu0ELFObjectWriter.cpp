@@ -54,11 +54,9 @@ unsigned Cpu0ELFObjectWriter::getRelocType(MCContext &Ctx,
   case FK_Data_4:
     Type = ELF::R_CPU0_32;
     break;
-#if 0 // CH >= CH8_1 //1
   case FK_GPRel_4:
     Type = ELF::R_CPU0_GPREL32;
     break;
-#endif
   case Cpu0::fixup_Cpu0_32:
     Type = ELF::R_CPU0_32;
     break;
@@ -87,14 +85,12 @@ unsigned Cpu0ELFObjectWriter::getRelocType(MCContext &Ctx,
     Type = ELF::R_CPU0_TLS_GOTTPREL;
     break;
 #endif
-#if 0 // CH >= CH8_1 //2
   case Cpu0::fixup_Cpu0_PC16:
     Type = ELF::R_CPU0_PC16;
     break;
   case Cpu0::fixup_Cpu0_PC24:
     Type = ELF::R_CPU0_PC24;
     break;
-#endif
 #if 0 // CH >= CH12_1
   case Cpu0::fixup_Cpu0_TP_HI:
     Type = ELF::R_CPU0_TLS_TP_HI16;

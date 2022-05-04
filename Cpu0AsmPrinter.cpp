@@ -162,12 +162,8 @@ void Cpu0AsmPrinter::emitInstruction(const MachineInstr *MI) {
 #endif
 #endif //#if CH >= CH9_3 //3
 
-#if 0 // CH >= CH8_2 //1
     if (I->isPseudo() && !isLongBranchPseudo(I->getOpcode()))
-#else
-    if (I->isPseudo())
-#endif //#if CH >= CH8_2 //1
-    llvm_unreachable("Pseudo opcode found in emitInstruction()");
+      llvm_unreachable("Pseudo opcode found in emitInstruction()");
 
     MCInst TmpInst0;
     MCInstLowering.Lower(&*I, TmpInst0);
@@ -518,12 +514,9 @@ void Cpu0AsmPrinter::PrintDebugValueComment(const MachineInstr *MI,
   OS << "PrintDebugValueComment()";
 }
 
-#if 0 // CH >= CH8_2 //2
 bool Cpu0AsmPrinter::isLongBranchPseudo(int Opcode) const {
-  return (Opcode == Cpu0::LONG_BRANCH_LUi
-          || Opcode == Cpu0::LONG_BRANCH_ADDiu);
+  return (Opcode == Cpu0::LONG_BRANCH_LUi || Opcode == Cpu0::LONG_BRANCH_ADDiu);
 }
-#endif
 
 // Force static initialization.
 extern "C" void LLVMInitializeCpu0AsmPrinter() {

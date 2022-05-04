@@ -50,7 +50,6 @@ static unsigned adjustFixupValue(const MCFixup &Fixup, uint64_t Value,
   case Cpu0::fixup_Cpu0_LO16:
   case Cpu0::fixup_Cpu0_GOT_LO16:
     break;
-#if 0 // CH >= CH8_1 //1
   case Cpu0::fixup_Cpu0_PC16:
   case Cpu0::fixup_Cpu0_PC24:
     // So far we are only using this type for branches and jump.
@@ -58,7 +57,6 @@ static unsigned adjustFixupValue(const MCFixup &Fixup, uint64_t Value,
     // so the displacement will be one instruction size less.
     Value -= 4;
     break;
-#endif
   case Cpu0::fixup_Cpu0_HI16:
   case Cpu0::fixup_Cpu0_GOT:
   case Cpu0::fixup_Cpu0_GOT_HI16:
@@ -141,10 +139,8 @@ Cpu0AsmBackend::getFixupKindInfo(MCFixupKind Kind) const {
     {"fixup_Cpu0_LO16", 0, 16, 0},
     {"fixup_Cpu0_GPREL16", 0, 16, 0},
     {"fixup_Cpu0_GOT", 0, 16, 0},
-#if 0 // CH >= CH8_1 //2
-    { "fixup_Cpu0_PC16",           0,     16,  MCFixupKindInfo::FKF_IsPCRel },
-    { "fixup_Cpu0_PC24",           0,     24,  JSUBReloRec },
-#endif
+    {"fixup_Cpu0_PC16", 0, 16, MCFixupKindInfo::FKF_IsPCRel},
+    {"fixup_Cpu0_PC24", 0, 24, JSUBReloRec},
 #if 0 // CH >= CH9_1
     { "fixup_Cpu0_CALL16",         0,     16,   0 },
 #endif

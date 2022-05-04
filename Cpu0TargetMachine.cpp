@@ -46,6 +46,9 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeCpu0Target() {
   RegisterTargetMachine<Cpu0ebTargetMachine> X(getTheCpu0Target());
   // Little endian Target Machine
   RegisterTargetMachine<Cpu0elTargetMachine> Y(getTheCpu0elTarget());
+
+  PassRegistry *PR = PassRegistry::getPassRegistry();
+  initializeCpu0BranchExpansionPass(*PR);
 }
 
 static std::string computeDataLayout(const Triple &TT, StringRef CPU,
@@ -161,6 +164,8 @@ public:
   }
 
   bool addInstSelector() override;
+
+  void addPreEmitPass() override;
 };
 } // end namespace
 
@@ -173,4 +178,12 @@ TargetPassConfig *Cpu0TargetMachine::createPassConfig(PassManagerBase &PM) {
 bool Cpu0PassConfig::addInstSelector() {
   addPass(createCpu0SEISelDag(getCpu0TargetMachine(), getOptLevel()));
   return false;
+}
+
+// Implemented by targets that want to run passes immediately before
+// machine code is emitted. return true if -print-machineinstrs should
+// print out the code after the passes.
+void Cpu0PassConfig::addPreEmitPass() {
+  addPass(createCpu0BranchExpansion());
+  return;
 }

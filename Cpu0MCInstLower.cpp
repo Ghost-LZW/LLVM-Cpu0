@@ -102,7 +102,6 @@ MCOperand Cpu0MCInstLower::LowerSymbolOperand(const MachineOperand &MO,
     Offset += MO.getOffset();
     break;
 
-#if 0 // CH >= CH8_1
   case MachineOperand::MO_MachineBasicBlock:
     Symbol = MO.getMBB()->getSymbol();
     break;
@@ -111,7 +110,6 @@ MCOperand Cpu0MCInstLower::LowerSymbolOperand(const MachineOperand &MO,
     Symbol = AsmPrinter.GetBlockAddressSymbol(MO.getBlockAddress());
     Offset += MO.getOffset();
     break;
-#endif
 
 #if 0 // CH >= CH9_1 // 2
   case MachineOperand::MO_ExternalSymbol:
@@ -120,11 +118,9 @@ MCOperand Cpu0MCInstLower::LowerSymbolOperand(const MachineOperand &MO,
     break;
 #endif
 
-#if 0 // CH >= CH8_1
   case MachineOperand::MO_JumpTableIndex:
     Symbol = AsmPrinter.GetJTISymbol(MO.getIndex());
     break;
-#endif
 
   default:
     llvm_unreachable("<unknown operand type>");
@@ -226,16 +222,12 @@ MCOperand Cpu0MCInstLower::LowerOperand(const MachineOperand &MO,
     return MCOperand::createReg(MO.getReg());
   case MachineOperand::MO_Immediate:
     return MCOperand::createImm(MO.getImm() + offset);
-#if 0 // CH >= CH8_1
   case MachineOperand::MO_MachineBasicBlock:
-#endif
 #if 0 // CH >= CH9_1 //3
   case MachineOperand::MO_ExternalSymbol:
 #endif
-#if 0 // CH >= CH8_1
   case MachineOperand::MO_JumpTableIndex:
   case MachineOperand::MO_BlockAddress:
-#endif
   case MachineOperand::MO_GlobalAddress:
     return LowerSymbolOperand(MO, MOTy, offset);
   case MachineOperand::MO_RegisterMask:
@@ -245,7 +237,6 @@ MCOperand Cpu0MCInstLower::LowerOperand(const MachineOperand &MO,
   return MCOperand();
 }
 
-#if 0 // CH >= CH8_2 //1
 MCOperand Cpu0MCInstLower::createSub(MachineBasicBlock *BB1,
                                      MachineBasicBlock *BB2,
                                      Cpu0MCExpr::Cpu0ExprKind Kind) const {
@@ -256,8 +247,8 @@ MCOperand Cpu0MCInstLower::createSub(MachineBasicBlock *BB1,
   return MCOperand::createExpr(Cpu0MCExpr::create(Kind, Sub, *Ctx));
 }
 
-void Cpu0MCInstLower::
-lowerLongBranchLUi(const MachineInstr *MI, MCInst &OutMI) const {
+void Cpu0MCInstLower::lowerLongBranchLUi(const MachineInstr *MI,
+                                         MCInst &OutMI) const {
   OutMI.setOpcode(Cpu0::LUi);
 
   // Lower register operand.
@@ -269,9 +260,9 @@ lowerLongBranchLUi(const MachineInstr *MI, MCInst &OutMI) const {
                              Cpu0MCExpr::CEK_ABS_HI));
 }
 
-void Cpu0MCInstLower::
-lowerLongBranchADDiu(const MachineInstr *MI, MCInst &OutMI, int Opcode,
-                     Cpu0MCExpr::Cpu0ExprKind Kind) const {
+void Cpu0MCInstLower::lowerLongBranchADDiu(
+    const MachineInstr *MI, MCInst &OutMI, int Opcode,
+    Cpu0MCExpr::Cpu0ExprKind Kind) const {
   OutMI.setOpcode(Opcode);
 
   // Lower two register operands.
@@ -281,8 +272,8 @@ lowerLongBranchADDiu(const MachineInstr *MI, MCInst &OutMI, int Opcode,
   }
 
   // Create %lo($tgt-$baltgt) or %hi($tgt-$baltgt).
-  OutMI.addOperand(createSub(MI->getOperand(2).getMBB(),
-                             MI->getOperand(3).getMBB(), Kind));
+  OutMI.addOperand(
+      createSub(MI->getOperand(2).getMBB(), MI->getOperand(3).getMBB(), Kind));
 }
 
 bool Cpu0MCInstLower::lowerLongBranch(const MachineInstr *MI,
@@ -294,18 +285,14 @@ bool Cpu0MCInstLower::lowerLongBranch(const MachineInstr *MI,
     lowerLongBranchLUi(MI, OutMI);
     return true;
   case Cpu0::LONG_BRANCH_ADDiu:
-    lowerLongBranchADDiu(MI, OutMI, Cpu0::ADDiu,
-                         Cpu0MCExpr::CEK_ABS_LO);
+    lowerLongBranchADDiu(MI, OutMI, Cpu0::ADDiu, Cpu0MCExpr::CEK_ABS_LO);
     return true;
   }
 }
-#endif
 
 void Cpu0MCInstLower::Lower(const MachineInstr *MI, MCInst &OutMI) const {
-#if 0 // CH >= CH8_2 //2
   if (lowerLongBranch(MI, OutMI))
     return;
-#endif
   OutMI.setOpcode(MI->getOpcode());
 
   for (const MachineOperand &MO : MI->operands()) {

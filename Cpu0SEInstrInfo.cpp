@@ -189,3 +189,16 @@ unsigned Cpu0SEInstrInfo::loadImmediate(int64_t Imm, MachineBasicBlock &MBB,
 
   return ATReg;
 }
+
+/// getOppositeBranchOpc - Return the inverse of the specified
+/// opcode, e.g. turning BEQ to BNE.
+unsigned Cpu0SEInstrInfo::getOppositeBranchOpc(unsigned Opc) const {
+  switch (Opc) {
+  default:
+    llvm_unreachable("Illegal opcode!");
+  case Cpu0::BEQ:
+    return Cpu0::BNE;
+  case Cpu0::BNE:
+    return Cpu0::BEQ;
+  }
+}

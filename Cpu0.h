@@ -8,13 +8,22 @@
 #define LLVM_LIB_TARGET_CPU0_CPU0_H
 
 #include "MCTargetDesc/Cpu0MCTargetDesc.h"
+
+#include "llvm/CodeGen/Passes.h"
+#include "llvm/MC/TargetRegistry.h"
+#include "llvm/PassRegistry.h"
 #include "llvm/Support/CodeGen.h"
+#include "llvm/Target/TargetMachine.h"
+
+#define ENABLE_GPRESTORE
 
 namespace llvm {
 class Cpu0TargetMachine;
 class FunctionPass;
-} // namespace llvm
 
-#define ENABLE_GPRESTORE // The $gp register caller saved register enable
+FunctionPass *createCpu0BranchExpansion();
+void initializeCpu0BranchExpansionPass(PassRegistry &);
+
+} // namespace llvm
 
 #endif

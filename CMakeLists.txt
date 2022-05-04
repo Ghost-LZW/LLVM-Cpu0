@@ -11,6 +11,7 @@ set(LLVM_TARGET_DEFINITIONS Cpu0Other.td)
 #  came from Cpu0InstrInfo.td.
 tablegen(LLVM Cpu0GenRegisterInfo.inc -gen-register-info)
 tablegen(LLVM Cpu0GenInstrInfo.inc -gen-instr-info)
+tablegen(LLVM Cpu0GenDisassemblerTables.inc -gen-disassembler)
 tablegen(LLVM Cpu0GenSubtargetInfo.inc -gen-subtarget)
 tablegen(LLVM Cpu0GenMCPseudoLowering.inc -gen-pseudo-lowering)
 tablegen(LLVM Cpu0GenDAGISel.inc -gen-dag-isel)
@@ -41,6 +42,7 @@ add_llvm_target(Cpu0CodeGen
   Cpu0ISelDAGToDAG.cpp
   Cpu0SEISelDAGToDAG.cpp
   Cpu0AnalyzeImmediate.cpp
+  Cpu0BranchExpansion.cpp
 
   LINK_COMPONENTS
   Analysis
@@ -50,6 +52,7 @@ add_llvm_target(Cpu0CodeGen
   MC
   Cpu0Desc
   Cpu0Info
+  Cpu0Disassembler
   Cpu0AsmParser
   SelectionDAG
   Support
@@ -63,4 +66,5 @@ add_llvm_target(Cpu0CodeGen
 # Should match with "subdirectories = MCTargetDesc TargetInfo" in LLVMBuild.txt
 add_subdirectory(TargetInfo)
 add_subdirectory(MCTargetDesc)
+add_subdirectory(Disassembler)
 add_subdirectory(AsmParser)

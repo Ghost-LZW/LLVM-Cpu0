@@ -51,9 +51,7 @@ private:
   // lowerOperand - Convert a MachineOperand into the equivalent MCOperand.
   bool lowerOperand(const MachineOperand &MO, MCOperand &MCOp);
 
-#if 0 // CH >= CH8_2 //1
   bool isLongBranchPseudo(int Opcode) const;
-#endif
 
 public:
   const Cpu0Subtarget *Subtarget;

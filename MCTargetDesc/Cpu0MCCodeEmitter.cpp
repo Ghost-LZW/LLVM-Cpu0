@@ -93,7 +93,6 @@ void Cpu0MCCodeEmitter::encodeInstruction(const MCInst &MI, raw_ostream &OS,
   EmitInstruction(Binary, Size, OS);
 }
 
-//@CH8_1 {
 /// getBranch16TargetOpValue - Return binary encoding of the branch
 /// target operand. If the machine operand requires relocation,
 /// record the relocation and return zero.
@@ -101,17 +100,16 @@ unsigned
 Cpu0MCCodeEmitter::getBranch16TargetOpValue(const MCInst &MI, unsigned OpNo,
                                             SmallVectorImpl<MCFixup> &Fixups,
                                             const MCSubtargetInfo &STI) const {
-#if 0 // CH >= CH8_1 //1
   const MCOperand &MO = MI.getOperand(OpNo);
 
   // If the destination is an immediate, we have nothing to do.
-  if (MO.isImm()) return MO.getImm();
+  if (MO.isImm())
+    return MO.getImm();
   assert(MO.isExpr() && "getBranch16TargetOpValue expects only expressions");
 
   const MCExpr *Expr = MO.getExpr();
-  Fixups.push_back(MCFixup::create(0, Expr,
-                                   MCFixupKind(Cpu0::fixup_Cpu0_PC16)));
-#endif
+  Fixups.push_back(
+      MCFixup::create(0, Expr, MCFixupKind(Cpu0::fixup_Cpu0_PC16)));
   return 0;
 }
 
@@ -122,17 +120,16 @@ unsigned
 Cpu0MCCodeEmitter::getBranch24TargetOpValue(const MCInst &MI, unsigned OpNo,
                                             SmallVectorImpl<MCFixup> &Fixups,
                                             const MCSubtargetInfo &STI) const {
-#if 0 // CH >= CH8_1 //2
   const MCOperand &MO = MI.getOperand(OpNo);
 
   // If the destination is an immediate, we have nothing to do.
-  if (MO.isImm()) return MO.getImm();
+  if (MO.isImm())
+    return MO.getImm();
   assert(MO.isExpr() && "getBranch24TargetOpValue expects only expressions");
 
   const MCExpr *Expr = MO.getExpr();
-  Fixups.push_back(MCFixup::create(0, Expr,
-                                   MCFixupKind(Cpu0::fixup_Cpu0_PC24)));
-#endif
+  Fixups.push_back(
+      MCFixup::create(0, Expr, MCFixupKind(Cpu0::fixup_Cpu0_PC24)));
   return 0;
 }
 
@@ -145,26 +142,22 @@ unsigned
 Cpu0MCCodeEmitter::getJumpTargetOpValue(const MCInst &MI, unsigned OpNo,
                                         SmallVectorImpl<MCFixup> &Fixups,
                                         const MCSubtargetInfo &STI) const {
-#if 0             // CH >= CH8_1 //3
   unsigned Opcode = MI.getOpcode();
   const MCOperand &MO = MI.getOperand(OpNo);
   // If the destination is an immediate, we have nothing to do.
-  if (MO.isImm()) return MO.getImm();
+  if (MO.isImm())
+    return MO.getImm();
   assert(MO.isExpr() && "getJumpTargetOpValue expects only expressions");
 
   const MCExpr *Expr = MO.getExpr();
-#if 0             // CH >= CH9_1 //1
+#if 0  // CH >= CH9_1 //1
   if (Opcode == Cpu0::JSUB || Opcode == Cpu0::JMP || Opcode == Cpu0::BAL)
-#elif CH >= CH8_2 // 1
-  if (Opcode == Cpu0::JMP || Opcode == Cpu0::BAL)
-#else
-  if (Opcode == Cpu0::JMP)
 #endif //#if CH >= CH9_1 //1
-    Fixups.push_back(MCFixup::create(0, Expr,
-                                     MCFixupKind(Cpu0::fixup_Cpu0_PC24)));
+  if (Opcode == Cpu0::JMP || Opcode == Cpu0::BAL)
+    Fixups.push_back(
+        MCFixup::create(0, Expr, MCFixupKind(Cpu0::fixup_Cpu0_PC24)));
   else
     llvm_unreachable("unexpect opcode in getJumpAbsoluteTargetOpValue()");
-#endif
   return 0;
 }
 
