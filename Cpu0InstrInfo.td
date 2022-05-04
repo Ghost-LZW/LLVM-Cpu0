@@ -89,6 +89,12 @@ def mem : Operand<iPTR> {
   let ParserMatchClass = Cpu0MemAsmOperand;
 }
 
+def mem_ea : Operand<iPTR> {
+  let PrintMethod = "printMemOperandEA";
+  let MIOperandInfo = (ops GPROut, simm16);
+  let EncoderMethod = "getMemEncoding";
+}
+
 // Transformation Function - get the lower 16 bits.
 def LO16 : SDNodeXForm<imm, [{
   return getImm(N, N->getZExtValue() & 0xffff);
@@ -147,7 +153,11 @@ class AlignedStore<PatFrag Node>
             }]>;
 
 // Load/Store PatFrags
+def sextloadi16_a   : AlignedLoad<sextloadi16>;
+def zextloadi16_a   : AlignedLoad<zextloadi16>;
+def extloadi16_a    : AlignedLoad<extloadi16>;
 def load_a          : AlignedLoad<load>;
+def truncstorei16_a : AlignedStore<truncstorei16>;
 def store_a         : AlignedStore<store>;
 
 //===----------------------------------------------------------------------===//
@@ -252,16 +262,14 @@ class StoreM<bits<8> op, string instrAsm, PatFrag opNode, RegisterClass regClass
 }
 
 // 32-bit load
-multiclass LoadM32<bits<8> op, string instrAsm,
-                   PatFrag opNode, bit pseudo=0> {
-  def NAME : LoadM<op, instrAsm, opNode, GPROut, mem, pseudo>;
-}
+class LoadM32<bits<8> op, string instrAsm,
+                   PatFrag opNode, bit pseudo=0>
+  : LoadM<op, instrAsm, opNode, GPROut, mem, pseudo>;
 
 // 32-bit store
-multiclass StoreM32<bits<8> op, string instrAsm,
-                    PatFrag opNode, bit pseudo=0> {
-  def NAME : StoreM<op, instrAsm, opNode, CPURegs, mem, pseudo>;
-}
+class StoreM32<bits<8> op, string instrAsm,
+                    PatFrag opNode, bit pseudo=0>
+  : StoreM<op, instrAsm, opNode, CPURegs, mem, pseudo>;
 
 class SetCC_R<bits<8> op, string instr_asm, PatFrag cond_op,
               RegisterClass RC>:
@@ -369,6 +377,28 @@ class C0Move<bits<8> op, string instr_asm>:
   let hasSideEffects = 0;
 }
 
+// Count Leading Ones/Zeros in Word
+class CountLeading0<bits<8> op, string instr_asm, RegisterClass RC>:
+  FA<op, (outs GPROut:$ra), (ins RC:$rb),
+     !strconcat(instr_asm, "\t$ra, $rb"),
+     [(set GPROut:$ra, (ctlz RC:$rb))], IICLZ> {
+  let rc = 0;
+  let shamt = 0;
+}
+
+class CountLeading1<bits<8> op, string instr_asm, RegisterClass RC>:
+  FA<op, (outs GPROut:$ra), (ins RC:$rb),
+     !strconcat(instr_asm, "\t$ra, $rb"),
+     [(set GPROut:$ra, (ctlz (not RC:$rb)))], IICLO> {
+  let rc = 0;
+  let shamt = 0;
+}
+
+//@EffectiveAddress
+class EffectiveAddress<string instr_asm, RegisterClass RC, Operand Mem> :
+  FMem<0x09, (outs RC:$ra), (ins Mem:$addr),
+     instr_asm, [(set RC:$ra, addr:$addr)], IIAlu>;
+
 // Return
 class RetBase<RegisterClass regClass> : JumpFR<0x3c, "ret", regClass> {
   let isReturn = 1;
@@ -403,8 +433,14 @@ def LoadAddr32Imm : LoadAddressImm<"la", shamt, GPROut>;
 
 // Load and Store Instructions
 // already aligned
-defm LD      : LoadM32<0x01,   "ld",   load_a>;
-defm ST      : StoreM32<0x02,  "st",   store_a>;
+def LD      : LoadM32<0x01,   "ld",   load_a>;
+def ST      : StoreM32<0x02,  "st",   store_a>;
+def LB     : LoadM32<0x03, "lb",  sextloadi8>;
+def LBu    : LoadM32<0x04, "lbu", zextloadi8>;
+def SB     : StoreM32<0x05, "sb", truncstorei8>;
+def LH     : LoadM32<0x06, "lh",  sextloadi16_a>;
+def LHu    : LoadM32<0x07, "lhu", zextloadi16_a>;
+def SH     : StoreM32<0x08, "sh", truncstorei16_a>;
 
 // Arithmetic Instructions (ALU Immediate)
 def ADDiu    : ArithLogicI<0x09, "addiu", add, simm16, immSExt16, CPURegs>;
@@ -491,6 +527,19 @@ def C0MOVE  : C0Move<0x52, "c0mov">;
 let addr=0 in
   def NOP    : FJ<0, (outs), (ins), "nop", [], IIAlu>;
 
+/// Count Leading
+def CLZ : CountLeading0<0x15, "clz", CPURegs>;
+def CLO : CountLeading1<0x16, "clo", CPURegs>;
+
+//@def LEA_ADDiu {
+// FrameIndexes are legalized when they are operands from load/store
+// instructions. The same not happens for stack address copies, so an
+// add op with mem ComplexPattern is used and the stack address copy
+// can be matched. It's similar to Sparc LEA_ADDRi
+def LEA_ADDiu : EffectiveAddress<"addiu\t$ra, $addr", CPURegs, mem_ea> {
+  let isCodeGenOnly = 1;
+}
+
 //===----------------------------------------------------------------------===//
 // Instruction aliases
 //===----------------------------------------------------------------------===//
@@ -513,9 +562,21 @@ def : Pat<(i32 immLow16Zero:$in),
 def : Pat<(i32 imm:$imm),
           (ORi (LUi (HI16 imm:$imm)), (LO16 imm:$imm))>;
 
+// Carry patterns
+def : Pat<(subc CPURegs:$lhs, CPURegs:$rhs),
+          (SUBu CPURegs:$lhs, CPURegs:$rhs)>;
+def : Pat<(addc CPURegs:$lhs, CPURegs:$rhs),
+          (ADDu CPURegs:$lhs, CPURegs:$rhs)>;
+def : Pat<(addc  CPURegs:$src, immSExt16:$imm),
+          (ADDiu CPURegs:$src, imm:$imm)>;
+
 def : Pat<(not CPURegs:$in),
 // 1's complement of in, ex. not(0xf000000f) == 0x0ffffff0
           (NOR CPURegs:$in, ZERO)>;
+
+def : Pat<(i32 (extloadi1  addr:$src)), (LBu addr:$src)>;
+def : Pat<(i32 (extloadi8  addr:$src)), (LBu addr:$src)>;
+def : Pat<(i32 (extloadi16_a addr:$src)), (LHu addr:$src)>;
 
 def : Pat<(Cpu0Hi tglobaladdr:$in), (LUi tglobaladdr:$in)>;
 

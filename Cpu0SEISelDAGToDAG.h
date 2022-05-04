@@ -37,10 +37,8 @@ private:
                                            const SDLoc &DL, EVT Ty, bool HasLo,
                                            bool HasHi);
 
-#if 0 // CH >= CH7_1
   void selectAddESubE(unsigned MOp, SDValue InFlag, SDValue CmpLHS,
                       const SDLoc &DL, SDNode *Node) const;
-#endif
 };
 
 FunctionPass *createCpu0SEISelDag(Cpu0TargetMachine &TM,

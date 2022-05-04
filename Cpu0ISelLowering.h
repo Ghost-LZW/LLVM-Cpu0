@@ -87,11 +87,9 @@ public:
   //  DAG node.
   const char *getTargetNodeName(unsigned Opcode) const override;
 
-#if 0 // CH >= CH7_1 //0.5
-    /// getSetCCResultType - get the ISD::SETCC result ValueType
-    EVT getSetCCResultType(const DataLayout &DL, LLVMContext &Context,
-                           EVT VT) const override;
-#endif
+  /// getSetCCResultType - get the ISD::SETCC result ValueType
+  EVT getSetCCResultType(const DataLayout &DL, LLVMContext &Context,
+                         EVT VT) const override;
 
   SDValue PerformDAGCombine(SDNode *N, DAGCombinerInfo &DCI) const override;
 
@@ -366,11 +364,8 @@ private:
     SDValue lowerATOMIC_FENCE(SDValue Op, SelectionDAG& DAG) const;
 #endif
 
-#if 0 // H >= CH7_1 //1
-    SDValue lowerShiftLeftParts(SDValue Op, SelectionDAG& DAG) const;
-    SDValue lowerShiftRightParts(SDValue Op, SelectionDAG& DAG,
-                                 bool IsSRA) const;
-#endif
+  SDValue lowerShiftLeftParts(SDValue Op, SelectionDAG &DAG) const;
+  SDValue lowerShiftRightParts(SDValue Op, SelectionDAG &DAG, bool IsSRA) const;
 
 #if 0 // H >= CH9_1 //6
     /// isEligibleForTailCallOptimization - Check whether the call is eligible
@@ -471,9 +466,7 @@ private:
                              unsigned AS,
                              Instruction *I = nullptr) const override;
 
-#if 0 // H >= CH7_1 //2
-    bool isOffsetFoldingLegal(const GlobalAddressSDNode *GA) const override;
-#endif
+  bool isOffsetFoldingLegal(const GlobalAddressSDNode *GA) const override;
 
 #if 0 // H >= CH12_1 //4
     bool shouldInsertFencesForAtomic(const Instruction *I) const override {

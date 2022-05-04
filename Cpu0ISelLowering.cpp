@@ -149,7 +149,6 @@ Cpu0TargetLowering::Cpu0TargetLowering(const Cpu0TargetMachine &TM,
                                        const Cpu0Subtarget &STI)
     : TargetLowering(TM), Subtarget(STI), ABI(TM.getABI()) {
 
-#if 0 // H >= CH7_1 //1
   // Cpu0 does not have i1 type, so use i32 for
   // setcc operations results (slt, sgt, ...).
   setBooleanContents(ZeroOrOneBooleanContent);
@@ -157,11 +156,10 @@ Cpu0TargetLowering::Cpu0TargetLowering(const Cpu0TargetMachine &TM,
 
   // Load extented operations for i1 types must be promoted
   for (MVT VT : MVT::integer_valuetypes()) {
-    setLoadExtAction(ISD::EXTLOAD,  VT, MVT::i1,  Promote);
-    setLoadExtAction(ISD::ZEXTLOAD, VT, MVT::i1,  Promote);
-    setLoadExtAction(ISD::SEXTLOAD, VT, MVT::i1,  Promote);
+    setLoadExtAction(ISD::EXTLOAD, VT, MVT::i1, Promote);
+    setLoadExtAction(ISD::ZEXTLOAD, VT, MVT::i1, Promote);
+    setLoadExtAction(ISD::SEXTLOAD, VT, MVT::i1, Promote);
   }
-#endif
 
 #if 0 // H >= CH8_1 //2
   // Used by legalize types to correctly generate the setcc result.
@@ -193,12 +191,10 @@ Cpu0TargetLowering::Cpu0TargetLowering(const Cpu0TargetMachine &TM,
   setOperationAction(ISD::VASTART,            MVT::Other, Custom);
 #endif
 
-#if 0 // H >= CH7_1 //2
   // Handle i64 shl
-  setOperationAction(ISD::SHL_PARTS,          MVT::i32,   Expand);
-  setOperationAction(ISD::SRA_PARTS,          MVT::i32,   Expand);
-  setOperationAction(ISD::SRL_PARTS,          MVT::i32,   Expand);
-#endif
+  setOperationAction(ISD::SHL_PARTS, MVT::i32, Expand);
+  setOperationAction(ISD::SRA_PARTS, MVT::i32, Expand);
+  setOperationAction(ISD::SRL_PARTS, MVT::i32, Expand);
 
 #if 0 // H >= CH9_3 //0.7
   setOperationAction(ISD::ADD,                MVT::i32,   Custom);
@@ -218,12 +214,10 @@ Cpu0TargetLowering::Cpu0TargetLowering(const Cpu0TargetMachine &TM,
   setOperationAction(ISD::SELECT_CC,         MVT::i32, Expand);
   setOperationAction(ISD::SELECT_CC,         MVT::Other, Expand);
 #endif
-#if 0 // H >= CH7_1 //3
-  setOperationAction(ISD::CTPOP,             MVT::i32,   Expand);
-  setOperationAction(ISD::CTTZ,              MVT::i32,   Expand);
-  setOperationAction(ISD::CTTZ_ZERO_UNDEF,   MVT::i32,   Expand);
-  setOperationAction(ISD::CTLZ_ZERO_UNDEF,   MVT::i32,   Expand);
-#endif
+  setOperationAction(ISD::CTPOP, MVT::i32, Expand);
+  setOperationAction(ISD::CTTZ, MVT::i32, Expand);
+  setOperationAction(ISD::CTTZ_ZERO_UNDEF, MVT::i32, Expand);
+  setOperationAction(ISD::CTLZ_ZERO_UNDEF, MVT::i32, Expand);
   // Cpu0 doesn't have sext_inreg, replace them with shl/sra.
   setOperationAction(ISD::SIGN_EXTEND_INREG, MVT::i1, Expand);
   setOperationAction(ISD::SIGN_EXTEND_INREG, MVT::i8, Expand);
@@ -277,14 +271,12 @@ Cpu0TargetLowering::create(const Cpu0TargetMachine &TM,
   return llvm::createCpu0SETargetLowering(TM, STI);
 }
 
-#if 0 // H >= CH7_1 //3.5
 EVT Cpu0TargetLowering::getSetCCResultType(const DataLayout &, LLVMContext &,
                                            EVT VT) const {
   if (!VT.isVector())
     return MVT::i32;
   return VT.changeVectorElementTypeToInteger();
 }
-#endif
 
 static SDValue performDivRemCombine(SDNode *N, SelectionDAG &DAG,
                                     TargetLowering::DAGCombinerInfo &DCI,
@@ -2141,13 +2133,11 @@ bool Cpu0TargetLowering::isLegalAddressingMode(const DataLayout &DL,
   return true;
 }
 
-#if 0 // H >= CH7_1 //4
-bool
-Cpu0TargetLowering::isOffsetFoldingLegal(const GlobalAddressSDNode *GA) const {
+bool Cpu0TargetLowering::isOffsetFoldingLegal(
+    const GlobalAddressSDNode *GA) const {
   // The Cpu0 target isn't yet aware of offsets.
   return false;
 }
-#endif
 
 #if 0 // H >= CH9_2 //5
 Cpu0TargetLowering::Cpu0CC::SpecialCallingConvType

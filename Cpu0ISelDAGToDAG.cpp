@@ -104,15 +104,14 @@ bool Cpu0DAGToDAGISel::selectAddr(SDNode *Parent, SDValue Addr, SDValue &Base,
       return false;
   }
 
-#if 0 // CH >= CH7_1 //1
   // Addresses of the form FI+const or FI|const
   if (CurDAG->isBaseWithConstantOffset(Addr)) {
     ConstantSDNode *CN = dyn_cast<ConstantSDNode>(Addr.getOperand(1));
     if (isInt<16>(CN->getSExtValue())) {
 
       // If the first operand is a FI, get the TargetFI Node
-      if (FrameIndexSDNode *FIN = dyn_cast<FrameIndexSDNode>
-                                  (Addr.getOperand(0)))
+      if (FrameIndexSDNode *FIN =
+              dyn_cast<FrameIndexSDNode>(Addr.getOperand(0)))
         Base = CurDAG->getTargetFrameIndex(FIN->getIndex(), ValTy);
       else
         Base = Addr.getOperand(0);
@@ -121,7 +120,6 @@ bool Cpu0DAGToDAGISel::selectAddr(SDNode *Parent, SDValue Addr, SDValue &Base,
       return true;
     }
   }
-#endif
 
   Base = Addr;
   Offset = CurDAG->getTargetConstant(0, DL, ValTy);
