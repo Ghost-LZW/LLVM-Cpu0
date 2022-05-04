@@ -1,10 +1,8 @@
-//===-- Cpu0ISelLowering.h - Cpu0 DAG Lowering Interface --------*- C++ -*-===//
+// Copyright 2022 All Rights Reserved.
+// Author: lanzongwei541@gmail.com (lanzongwei)
 //
-//                     The LLVM Compiler Infrastructure
-//
-// This file is distributed under the University of Illinois Open Source
-// License. See LICENSE.TXT for details.
-//
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //===----------------------------------------------------------------------===//
 //
 // This file defines the interfaces that Cpu0 uses to lower LLVM code into a
@@ -93,28 +91,6 @@ public:
 
   SDValue PerformDAGCombine(SDNode *N, DAGCombinerInfo &DCI) const override;
 
-#if 0 // CH >= CH12_1 //2
-    MachineBasicBlock *
-    EmitInstrWithCustomInserter(MachineInstr &MI,
-                                MachineBasicBlock *MBB) const override;
-#endif
-
-#if 0 // CH >= CH12_1 //5
-    /// If a physical register, this returns the register that receives the
-    /// exception address on entry to an EH pad.
-    Register
-    getExceptionPointerRegister(const Constant *PersonalityFn) const override {
-      return Cpu0::A0;
-    }
-
-    /// If a physical register, this returns the register that receives the
-    /// exception typeid on entry to a landing pad.
-    Register
-    getExceptionSelectorRegister(const Constant *PersonalityFn) const override {
-      return Cpu0::A1;
-    }
-#endif
-
 protected:
   SDValue getGlobalReg(SelectionDAG &DAG, EVT Ty) const;
 
@@ -186,17 +162,6 @@ protected:
                        DAG.getNode(Cpu0ISD::Lo, DL, Ty, Lo));
   }
 
-#if 0 // CH >= CH9_2 //1
-    /// This function fills Ops, which is the list of operands that will later
-    /// be used when a function call node is created. It also generates
-    /// copyToReg nodes to set up argument registers.
-    virtual void
-    getOpndList(SmallVectorImpl<SDValue> &Ops,
-                std::deque< std::pair<unsigned, SDValue> > &RegsToPass,
-                bool IsPICCall, bool GlobalOrExternal, bool InternalLinkage,
-                CallLoweringInfo &CLI, SDValue Callee, SDValue Chain) const;
-#endif
-
   /// ByValArgInfo - Byval argument information.
   struct ByValArgInfo {
     unsigned FirstIdx; // Index of the first register used.
@@ -215,18 +180,6 @@ protected:
     Cpu0CC(CallingConv::ID CallConv, bool IsO32, CCState &Info,
            SpecialCallingConvType SpecialCallingConv = NoSpecialCallingConv);
 
-#if 0 // CH >= CH9_2 //2
-      void analyzeCallOperands(const SmallVectorImpl<ISD::OutputArg> &Outs,
-                               bool IsVarArg, bool IsSoftFloat,
-                               const SDNode *CallNode,
-                               std::vector<ArgListEntry> &FuncArgs);
-#endif
-#if 0 // CH >= CH9_1 //1
-      void analyzeFormalArguments(const SmallVectorImpl<ISD::InputArg> &Ins,
-                                  bool IsSoftFloat,
-                                  Function::const_arg_iterator FuncArg);
-#endif
-
     void analyzeCallResult(const SmallVectorImpl<ISD::InputArg> &Ins,
                            bool IsSoftFloat, const SDNode *CallNode,
                            const Type *RetTy) const;
@@ -239,50 +192,15 @@ protected:
     /// hasByValArg - Returns true if function has byval arguments.
     bool hasByValArg() const { return !ByValArgs.empty(); }
 
-#if 0 // CH >= CH9_1 //2
-      /// regSize - Size (in number of bits) of integer registers.
-      unsigned regSize() const { return IsO32 ? 4 : 4; }
-      /// numIntArgRegs - Number of integer registers available for calls.
-      unsigned numIntArgRegs() const;
-#endif
-
     /// reservedArgArea - The size of the area the caller reserves for
     /// register arguments. This is 16-byte if ABI is O32.
     unsigned reservedArgArea() const;
 
-#if 0 // CH >= CH9_1 //3
-      /// Return pointer to array of integer argument registers.
-      const ArrayRef<MCPhysReg> intArgRegs() const;
-#endif
-
-    typedef SmallVectorImpl<ByValArgInfo>::const_iterator byval_iterator;
+    using byval_iterator = SmallVectorImpl<ByValArgInfo>::const_iterator;
     byval_iterator byval_begin() const { return ByValArgs.begin(); }
     byval_iterator byval_end() const { return ByValArgs.end(); }
 
   private:
-#if 0 // CH >= CH9_1 //4
-      void handleByValArg(unsigned ValNo, MVT ValVT, MVT LocVT,
-                          CCValAssign::LocInfo LocInfo,
-                          ISD::ArgFlagsTy ArgFlags);
-
-      /// useRegsForByval - Returns true if the calling convention allows the
-      /// use of registers to pass byval arguments.
-      bool useRegsForByval() const { return CallConv != CallingConv::Fast; }
-
-      /// Return the function that analyzes fixed argument list functions.
-      llvm::CCAssignFn *fixedArgFn() const;
-#endif
-
-#if 0 // H >= CH9_3 //1
-      /// Return the function that analyzes variable argument list functions.
-      llvm::CCAssignFn *varArgFn() const;
-#endif
-
-#if 0 // H >= CH9_1 //5
-      void allocateRegs(ByValArgInfo &ByVal, unsigned ByValSize,
-                        unsigned Align);
-#endif
-
     /// Return the type of the register which is used to pass an argument or
     /// return a value. This function returns f64 if the argument is an i64
     /// value which has been generated as a result of softening an f128 value.
@@ -322,85 +240,14 @@ private:
   SDValue getTargetNode(JumpTableSDNode *N, EVT Ty, SelectionDAG &DAG,
                         unsigned Flag) const;
 
-#if 0 // H >= CH9_2 //3
-    Cpu0CC::SpecialCallingConvType getSpecialCallingConv(SDValue Callee) const;
-#endif
-
-#if 0 // H >= CH9_2 //4
-    // Lower Operand helpers
-    SDValue LowerCallResult(SDValue Chain, SDValue InFlag,
-                            CallingConv::ID CallConv, bool isVarArg,
-                            const SmallVectorImpl<ISD::InputArg> &Ins,
-                            const SDLoc &dl, SelectionDAG &DAG,
-                            SmallVectorImpl<SDValue> &InVals,
-                            const SDNode *CallNode, const Type *RetTy) const;
-#endif
-
   // Lower Operand specifics
   SDValue lowerBR_JT(SDValue Op, SelectionDAG &DAG) const;
   SDValue lowerBRCOND(SDValue Op, SelectionDAG &DAG) const;
   SDValue lowerBlockAddress(SDValue Op, SelectionDAG &DAG) const;
   SDValue lowerJumpTable(SDValue Op, SelectionDAG &DAG) const;
   SDValue lowerGlobalAddress(SDValue Op, SelectionDAG &DAG) const;
-#if 0 // H >= CH12_1 //1
-    SDValue lowerGlobalTLSAddress(SDValue Op, SelectionDAG &DAG) const;
-#endif
-#if 0 // 8_2
-    SDValue lowerSELECT(SDValue Op, SelectionDAG &DAG) const;
-#endif
-#if 0 // H >= CH9_3 //2
-    SDValue lowerVASTART(SDValue Op, SelectionDAG &DAG) const;
-    SDValue lowerFRAMEADDR(SDValue Op, SelectionDAG &DAG) const;
-    SDValue lowerRETURNADDR(SDValue Op, SelectionDAG &DAG) const;
-    SDValue lowerEH_RETURN(SDValue Op, SelectionDAG &DAG) const;
-    SDValue lowerADD(SDValue Op, SelectionDAG &DAG) const;
-#endif
-
-#if 0 // H >= CH12_1 //3
-    SDValue lowerATOMIC_FENCE(SDValue Op, SelectionDAG& DAG) const;
-#endif
-
   SDValue lowerShiftLeftParts(SDValue Op, SelectionDAG &DAG) const;
   SDValue lowerShiftRightParts(SDValue Op, SelectionDAG &DAG, bool IsSRA) const;
-
-#if 0 // H >= CH9_1 //6
-    /// isEligibleForTailCallOptimization - Check whether the call is eligible
-    /// for tail call optimization.
-    virtual bool
-    isEligibleForTailCallOptimization(const Cpu0CC &Cpu0CCInfo,
-                                      unsigned NextStackOffset,
-                                      const Cpu0FunctionInfo& FI) const = 0;
-#endif
-
-#if 0 // H >= CH9_1 //7
-    /// copyByValArg - Copy argument registers which were used to pass a byval
-    /// argument to the stack. Create a stack frame object for the byval
-    /// argument.
-    void copyByValRegs(SDValue Chain, const SDLoc &DL,
-                       std::vector<SDValue> &OutChains, SelectionDAG &DAG,
-                       const ISD::ArgFlagsTy &Flags,
-                       SmallVectorImpl<SDValue> &InVals,
-                       const Argument *FuncArg,
-                       const Cpu0CC &CC, const ByValArgInfo &ByVal) const;
-#endif
-
-#if 0 // H >= CH9_2 //5
-    /// passByValArg - Pass a byval argument in registers or on stack.
-    void passByValArg(SDValue Chain, const SDLoc &DL,
-                      std::deque< std::pair<unsigned, SDValue> > &RegsToPass,
-                      SmallVectorImpl<SDValue> &MemOpChains, SDValue StackPtr,
-                      MachineFrameInfo &MFI, SelectionDAG &DAG, SDValue Arg,
-                      const Cpu0CC &CC, const ByValArgInfo &ByVal,
-                      const ISD::ArgFlagsTy &Flags, bool isLittle) const;
-#endif
-
-#if 0 // H >= CH9_3 //3
-    /// writeVarArgRegs - Write variable function arguments passed in registers
-    /// to the stack. Also create a stack frame object for the first variable
-    /// argument.
-    void writeVarArgRegs(std::vector<SDValue> &OutChains, const Cpu0CC &CC,
-                         SDValue Chain, const SDLoc &DL, SelectionDAG &DAG) const;
-#endif
 
   //- must be exist even without function all
   SDValue LowerFormalArguments(SDValue Chain, CallingConv::ID CallConv,
@@ -408,24 +255,6 @@ private:
                                const SmallVectorImpl<ISD::InputArg> &Ins,
                                const SDLoc &dl, SelectionDAG &DAG,
                                SmallVectorImpl<SDValue> &InVals) const override;
-
-#if 0 // H >= CH9_2 //6
-    SDValue passArgOnStack(SDValue StackPtr, unsigned Offset, SDValue Chain,
-                           SDValue Arg, const SDLoc &DL, bool IsTailCall,
-                           SelectionDAG &DAG) const;
-#endif
-
-#if 0 // H >= CH9_1 //8
-    SDValue LowerCall(TargetLowering::CallLoweringInfo &CLI,
-                      SmallVectorImpl<SDValue> &InVals) const override;
-#endif
-
-#if 0 // H >= CH9_2 //7
-    bool CanLowerReturn(CallingConv::ID CallConv, MachineFunction &MF,
-                        bool isVarArg,
-                        const SmallVectorImpl<ISD::OutputArg> &Outs,
-                        LLVMContext &Context) const override;
-#endif
 
   SDValue LowerReturn(SDValue Chain, CallingConv::ID CallConv, bool IsVarArg,
                       const SmallVectorImpl<ISD::OutputArg> &Outs,
@@ -463,27 +292,6 @@ private:
                              Instruction *I = nullptr) const override;
 
   bool isOffsetFoldingLegal(const GlobalAddressSDNode *GA) const override;
-
-#if 0 // H >= CH12_1 //4
-    bool shouldInsertFencesForAtomic(const Instruction *I) const override {
-      return true;
-    }
-
-    /// Emit a sign-extension using shl/sra appropriately.
-    MachineBasicBlock *emitSignExtendToI32InReg(MachineInstr &MI,
-                                                MachineBasicBlock *BB,
-                                                unsigned Size, unsigned DstReg,
-                                                unsigned SrcRec) const;
-    MachineBasicBlock *emitAtomicBinary(MachineInstr &MI, MachineBasicBlock *BB,
-                    unsigned Size, unsigned BinOpcode, bool Nand = false) const;
-    MachineBasicBlock *emitAtomicBinaryPartword(MachineInstr &MI,
-                    MachineBasicBlock *BB, unsigned Size, unsigned BinOpcode,
-                    bool Nand = false) const;
-    MachineBasicBlock *emitAtomicCmpSwap(MachineInstr &MI,
-                                  MachineBasicBlock *BB, unsigned Size) const;
-    MachineBasicBlock *emitAtomicCmpSwapPartword(MachineInstr &MI,
-                                  MachineBasicBlock *BB, unsigned Size) const;
-#endif
 };
 const Cpu0TargetLowering *
 createCpu0SETargetLowering(const Cpu0TargetMachine &TM,

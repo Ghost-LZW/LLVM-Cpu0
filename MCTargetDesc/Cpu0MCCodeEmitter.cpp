@@ -150,9 +150,6 @@ Cpu0MCCodeEmitter::getJumpTargetOpValue(const MCInst &MI, unsigned OpNo,
   assert(MO.isExpr() && "getJumpTargetOpValue expects only expressions");
 
   const MCExpr *Expr = MO.getExpr();
-#if 0  // CH >= CH9_1 //1
-  if (Opcode == Cpu0::JSUB || Opcode == Cpu0::JMP || Opcode == Cpu0::BAL)
-#endif //#if CH >= CH9_1 //1
   if (Opcode == Cpu0::JMP || Opcode == Cpu0::BAL)
     Fixups.push_back(
         MCFixup::create(0, Expr, MCFixupKind(Cpu0::fixup_Cpu0_PC24)));
@@ -186,11 +183,6 @@ unsigned Cpu0MCCodeEmitter::getExprOpValue(const MCExpr *Expr,
     case Cpu0MCExpr::CEK_GPREL:
       FixupKind = Cpu0::fixup_Cpu0_GPREL16;
       break;
-#if 0 // CH >= CH9_1 //2
-    case Cpu0MCExpr::CEK_GOT_CALL:
-      FixupKind = Cpu0::fixup_Cpu0_CALL16;
-      break;
-#endif
     case Cpu0MCExpr::CEK_GOT:
       FixupKind = Cpu0::fixup_Cpu0_GOT;
       break;
@@ -200,29 +192,6 @@ unsigned Cpu0MCCodeEmitter::getExprOpValue(const MCExpr *Expr,
     case Cpu0MCExpr::CEK_ABS_LO:
       FixupKind = Cpu0::fixup_Cpu0_LO16;
       break;
-#if 0 // CH >= CH12_1
-    case Cpu0MCExpr::CEK_TLSGD:
-      FixupKind = Cpu0::fixup_Cpu0_TLSGD;
-      break;
-    case Cpu0MCExpr::CEK_TLSLDM:
-      FixupKind = Cpu0::fixup_Cpu0_TLSLDM;
-      break;
-    case Cpu0MCExpr::CEK_DTP_HI:
-      FixupKind = Cpu0::fixup_Cpu0_DTP_HI;
-      break;
-    case Cpu0MCExpr::CEK_DTP_LO:
-      FixupKind = Cpu0::fixup_Cpu0_DTP_LO;
-      break;
-    case Cpu0MCExpr::CEK_GOTTPREL:
-      FixupKind = Cpu0::fixup_Cpu0_GOTTPREL;
-      break;
-    case Cpu0MCExpr::CEK_TP_HI:
-      FixupKind = Cpu0::fixup_Cpu0_TP_HI;
-      break;
-    case Cpu0MCExpr::CEK_TP_LO:
-      FixupKind = Cpu0::fixup_Cpu0_TP_LO;
-      break;
-#endif
     case Cpu0MCExpr::CEK_GOT_HI16:
       FixupKind = Cpu0::fixup_Cpu0_GOT_HI16;
       break;

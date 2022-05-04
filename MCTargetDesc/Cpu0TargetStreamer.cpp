@@ -27,6 +27,5 @@ using namespace llvm;
 
 Cpu0TargetStreamer::Cpu0TargetStreamer(MCStreamer &S) : MCTargetStreamer(S) {}
 
-Cpu0TargetAsmStreamer::Cpu0TargetAsmStreamer(MCStreamer &S,
-                                             formatted_raw_ostream &OS)
-    : Cpu0TargetStreamer(S), OS(OS) {}
+Cpu0TargetAsmStreamer::Cpu0TargetAsmStreamer(MCStreamer &S)
+    : Cpu0TargetStreamer(S) {}

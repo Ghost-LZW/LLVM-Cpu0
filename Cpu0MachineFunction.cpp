@@ -6,11 +6,10 @@
 
 #include "Cpu0MachineFunction.h"
 
-#if 0 // CH >= CH3_2
-#include "MCTargetDesc/Cpu0BaseInfo.h"
-#endif
 #include "Cpu0InstrInfo.h"
 #include "Cpu0Subtarget.h"
+#include "MCTargetDesc/Cpu0BaseInfo.h"
+
 #include "llvm/CodeGen/MachineInstrBuilder.h"
 #include "llvm/CodeGen/MachineRegisterInfo.h"
 #include "llvm/IR/Function.h"
@@ -38,15 +37,5 @@ void Cpu0FunctionInfo::createEhDataRegsFI() {
         TRI.getSpillSize(RC), TRI.getSpillAlign(RC), false);
   }
 }
-
-#if 0 // CH >= CH9_2
-MachinePointerInfo Cpu0FunctionInfo::callPtrInfo(const char *ES) {
-  return MachinePointerInfo(MF.getPSVManager().getExternalSymbolCallEntry(ES));
-}
-
-MachinePointerInfo Cpu0FunctionInfo::callPtrInfo(const GlobalValue *GV) {
-  return MachinePointerInfo(MF.getPSVManager().getGlobalValueCallEntry(GV));
-}
-#endif
 
 void Cpu0FunctionInfo::anchor() {}

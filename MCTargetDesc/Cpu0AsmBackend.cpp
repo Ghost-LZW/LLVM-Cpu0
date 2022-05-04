@@ -44,9 +44,6 @@ static unsigned adjustFixupValue(const MCFixup &Fixup, uint64_t Value,
     return 0;
   case FK_GPRel_4:
   case FK_Data_4:
-#if 0 // CH >= CH9_1
-  case Cpu0::fixup_Cpu0_CALL16:
-#endif
   case Cpu0::fixup_Cpu0_LO16:
   case Cpu0::fixup_Cpu0_GOT_LO16:
     break;
@@ -130,32 +127,19 @@ Cpu0AsmBackend::getFixupKindInfo(MCFixupKind Kind) const {
     JSUBReloRec = MCFixupKindInfo::FKF_IsPCRel | MCFixupKindInfo::FKF_Constant;
   }
   const static MCFixupKindInfo Infos[Cpu0::NumTargetFixupKinds] = {
-    // This table *must* be in same the order of fixup_* kinds in
-    // Cpu0FixupKinds.h.
-    //
-    // name                        offset  bits  flags
-    {"fixup_Cpu0_32", 0, 32, 0},
-    {"fixup_Cpu0_HI16", 0, 16, 0},
-    {"fixup_Cpu0_LO16", 0, 16, 0},
-    {"fixup_Cpu0_GPREL16", 0, 16, 0},
-    {"fixup_Cpu0_GOT", 0, 16, 0},
-    {"fixup_Cpu0_PC16", 0, 16, MCFixupKindInfo::FKF_IsPCRel},
-    {"fixup_Cpu0_PC24", 0, 24, JSUBReloRec},
-#if 0 // CH >= CH9_1
-    { "fixup_Cpu0_CALL16",         0,     16,   0 },
-#endif
-#if 0 // CH >= CH12_1
-    { "fixup_Cpu0_TLSGD",          0,     16,   0 },
-    { "fixup_Cpu0_GOTTP",          0,     16,   0 },
-    { "fixup_Cpu0_TP_HI",          0,     16,   0 },
-    { "fixup_Cpu0_TP_LO",          0,     16,   0 },
-    { "fixup_Cpu0_TLSLDM",         0,     16,   0 },
-    { "fixup_Cpu0_DTP_HI",         0,     16,   0 },
-    { "fixup_Cpu0_DTP_LO",         0,     16,   0 },
-#endif
-    {"fixup_Cpu0_GOT_HI16", 0, 16, 0},
-    {"fixup_Cpu0_GOT_LO16", 0, 16, 0}
-  };
+      // This table *must* be in same the order of fixup_* kinds in
+      // Cpu0FixupKinds.h.
+      //
+      // name                        offset  bits  flags
+      {"fixup_Cpu0_32", 0, 32, 0},
+      {"fixup_Cpu0_HI16", 0, 16, 0},
+      {"fixup_Cpu0_LO16", 0, 16, 0},
+      {"fixup_Cpu0_GPREL16", 0, 16, 0},
+      {"fixup_Cpu0_GOT", 0, 16, 0},
+      {"fixup_Cpu0_PC16", 0, 16, MCFixupKindInfo::FKF_IsPCRel},
+      {"fixup_Cpu0_PC24", 0, 24, JSUBReloRec},
+      {"fixup_Cpu0_GOT_HI16", 0, 16, 0},
+      {"fixup_Cpu0_GOT_LO16", 0, 16, 0}};
 
   if (Kind < FirstTargetFixupKind)
     return MCAsmBackend::getFixupKindInfo(Kind);

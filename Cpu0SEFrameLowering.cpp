@@ -52,19 +52,13 @@ Cpu0SEFrameLowering::Cpu0SEFrameLowering(const Cpu0Subtarget &STI)
 void Cpu0SEFrameLowering::emitPrologue(MachineFunction &MF,
                                        MachineBasicBlock &MBB) const {
   MachineFrameInfo &MFI = MF.getFrameInfo();
-  Cpu0FunctionInfo *Cpu0FI = MF.getInfo<Cpu0FunctionInfo>();
 
   const Cpu0SEInstrInfo &TII =
       *static_cast<const Cpu0SEInstrInfo *>(STI.getInstrInfo());
-  const Cpu0RegisterInfo &RegInfo =
-      *static_cast<const Cpu0RegisterInfo *>(STI.getRegisterInfo());
 
   MachineBasicBlock::iterator MBBI = MBB.begin();
   DebugLoc dl = MBBI != MBB.end() ? MBBI->getDebugLoc() : DebugLoc();
-  Cpu0ABIInfo ABI = STI.getABI();
   unsigned SP = Cpu0::SP;
-
-  const TargetRegisterClass *RC = &Cpu0::GPROutRegClass;
 
   // First, compute final stack size.
   uint64_t StackSize = MFI.getStackSize();
@@ -115,15 +109,11 @@ void Cpu0SEFrameLowering::emitEpilogue(MachineFunction &MF,
                                        MachineBasicBlock &MBB) const {
   MachineBasicBlock::iterator MBBI = MBB.getFirstTerminator();
   MachineFrameInfo &MFI = MF.getFrameInfo();
-  Cpu0FunctionInfo *Cpu0FI = MF.getInfo<Cpu0FunctionInfo>();
 
   const Cpu0SEInstrInfo &TII =
       *static_cast<const Cpu0SEInstrInfo *>(STI.getInstrInfo());
-  const Cpu0RegisterInfo &RegInfo =
-      *static_cast<const Cpu0RegisterInfo *>(STI.getRegisterInfo());
 
   DebugLoc DL = MBBI != MBB.end() ? MBBI->getDebugLoc() : DebugLoc();
-  Cpu0ABIInfo ABI = STI.getABI();
   unsigned SP = Cpu0::SP;
 
   // Get the number of bytes from FrameInfo
@@ -163,7 +153,6 @@ void Cpu0SEFrameLowering::determineCalleeSaves(MachineFunction &MF,
                                                BitVector &SavedRegs,
                                                RegScavenger *RS) const {
   TargetFrameLowering::determineCalleeSaves(MF, SavedRegs, RS);
-  Cpu0FunctionInfo *Cpu0FI = MF.getInfo<Cpu0FunctionInfo>();
 
   if (MF.getFrameInfo().hasCalls())
     setAliasRegs(MF, SavedRegs, Cpu0::LR);

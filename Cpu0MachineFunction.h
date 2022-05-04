@@ -27,38 +27,10 @@ class Cpu0FunctionInfo : public MachineFunctionInfo {
 public:
   Cpu0FunctionInfo(MachineFunction &MF)
       : MF(MF), VarArgsFrameIndex(0), SRetReturnReg(0), CallsEhReturn(false),
-        CallsEhDwarf(false), GlobalBaseReg(0),
-#if 0 // CH >= CH9_1 //1
-    InArgFIRange(std::make_pair(-1, 0)),
-    OutArgFIRange(std::make_pair(-1, 0)), GPFI(0), DynAllocFI(0),
-#endif
-        EmitNOAT(false), MaxCallFrameSize(0) {
-  }
+        CallsEhDwarf(false), GlobalBaseReg(0), EmitNOAT(false),
+        MaxCallFrameSize(0) {}
 
   ~Cpu0FunctionInfo();
-
-#if 0 // CH >= CH9_1 //2
-  bool isInArgFI(int FI) const {
-    return FI <= InArgFIRange.first && FI >= InArgFIRange.second;
-  }
-  void setLastInArgFI(int FI) { InArgFIRange.second = FI; }
-  bool isOutArgFI(int FI) const {
-    return FI <= OutArgFIRange.first && FI >= OutArgFIRange.second;
-  }
-#endif
-
-#if 0 // CH >= CH9_1 //3
-  int getGPFI() const { return GPFI; }
-  void setGPFI(int FI) { GPFI = FI; }
-  bool isGPFI(int FI) const { return GPFI && GPFI == FI; }
-#if CH >= CH9_3
-#ifdef ENABLE_GPRESTORE
-  bool needGPSaveRestore() const { return getGPFI(); }
-#endif
-#endif //#if CH >= CH9_3
-
-  bool isDynAllocFI(int FI) const { return DynAllocFI && DynAllocFI == FI; }
-#endif
 
   unsigned getSRetReturnReg() const { return SRetReturnReg; }
   void setSRetReturnReg(unsigned Reg) { SRetReturnReg = Reg; }
@@ -91,16 +63,6 @@ public:
   void setMaxCallFrameSize(unsigned S) { MaxCallFrameSize = S; }
   bool getEmitNOAT() const { return EmitNOAT; }
   void setEmitNOAT() { EmitNOAT = true; }
-
-#if 0 // CH >= CH9_2
-  /// Create a MachinePointerInfo that has an ExternalSymbolPseudoSourceValue
-  /// object representing a GOT entry for an external function.
-  MachinePointerInfo callPtrInfo(const char *ES);
-
-  /// Create a MachinePointerInfo that has a GlobalValuePseudoSourceValue object
-  /// representing a GOT entry for a global function.
-  MachinePointerInfo callPtrInfo(const GlobalValue *GV);
-#endif
 
 private:
   virtual void anchor();
@@ -135,19 +97,6 @@ private:
   /// relocation models.
   unsigned GlobalBaseReg;
 
-#if 0 // CH >= CH9_1 //4
-  // Range of frame object indices.
-  // InArgFIRange: Range of indices of all frame objects created during call to
-  //               LowerFormalArguments.
-  // OutArgFIRange: Range of indices of all frame objects created during call to
-  //                LowerCall except for the frame object for restoring $gp.
-  std::pair<int, int> InArgFIRange, OutArgFIRange;
-#endif
-
-  int GPFI; // Index of the frame object for restoring $gp
-#if 0       // CH >= CH9_1 //5
-  mutable int DynAllocFI; // Frame index of dynamically allocated stack area.
-#endif
   bool EmitNOAT;
   unsigned MaxCallFrameSize;
 };

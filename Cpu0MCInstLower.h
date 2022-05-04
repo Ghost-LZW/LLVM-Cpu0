@@ -34,11 +34,7 @@ public:
   void Lower(const MachineInstr *MI, MCInst &OutMI) const;
   MCOperand LowerOperand(const MachineOperand &MO, int64_t offset = 0) const;
   void LowerCPLOAD(SmallVector<MCInst, 4> &MCInsts);
-#if 0 // CH >= CH9_3
-#ifdef ENABLE_GPRESTORE
-  void LowerCPRESTORE(int64_t Offset, SmallVector<MCInst, 4>& MCInsts);
-#endif
-#endif //#if CH >= CH9_3
+
 private:
   MCOperand LowerSymbolOperand(const MachineOperand &MO,
                                MachineOperandType MOTy, unsigned Offset) const;

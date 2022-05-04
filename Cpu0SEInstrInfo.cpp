@@ -75,11 +75,6 @@ bool Cpu0SEInstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
   case Cpu0::RetLR:
     expandRetLR(MBB, MI);
     break;
-#if 0  // CH >= CH9_3 //1
-  case Cpu0::CPU0eh_return32:
-    expandEhReturn(MBB, MI);
-    break;
-#endif //#if CH >= CH9_3 //1
   }
 
   MBB.erase(MI);

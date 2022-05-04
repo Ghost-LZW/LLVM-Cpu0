@@ -235,7 +235,7 @@ class LogicNOR<bits<8> op, string instr_asm, RegisterClass RC>:
 }
 
 // Shifts
-class shift_rotate_imm<bits<8> op, bits<4> isRotate, string instr_asm,
+class shift_rotate_imm<bits<8> op, string instr_asm,
                        SDNode OpNode, PatFrag PF, Operand ImmOpnd,
                        RegisterClass RC>:
   FA<op, (outs GPROut:$ra), (ins RC:$rb, ImmOpnd:$shamt),
@@ -245,11 +245,11 @@ class shift_rotate_imm<bits<8> op, bits<4> isRotate, string instr_asm,
 }
 
 // 32-bit shift instructions.
-class shift_rotate_imm32<bits<8> op, bits<4> isRotate, string instr_asm,
+class shift_rotate_imm32<bits<8> op, string instr_asm,
                          SDNode OpNode>:
-  shift_rotate_imm<op, isRotate, instr_asm, OpNode, immZExt5, shamt, CPURegs>;
+  shift_rotate_imm<op, instr_asm, OpNode, immZExt5, shamt, CPURegs>;
 
-class shift_rotate_reg<bits<8> op, bits<4> isRotate, string instr_asm,
+class shift_rotate_reg<bits<8> op, string instr_asm,
                        SDNode OpNode, RegisterClass RC>:
   FA<op, (outs GPROut:$ra), (ins RC:$rb, RC:$rc),
      !strconcat(instr_asm, "\t$ra, $rb, $rc"),
@@ -303,8 +303,7 @@ class StoreM32<bits<8> op, string instrAsm,
   : StoreM<op, instrAsm, opNode, CPURegs, mem, pseudo>;
 
 // Conditional Branch, e.g. JEQ brtarget24
-class CBranch24<bits<8> op, string instr_asm, RegisterClass RC,
-                   list<Register> UseRegs>:
+class CBranch24<bits<8> op, string instr_asm, RegisterClass RC>:
   FJ<op, (outs), (ins RC:$ra, brtarget24:$addr),
              !strconcat(instr_asm, "\t$ra, $addr"),
              [], IIBranch>, Requires<[HasCmp]> {
@@ -364,16 +363,12 @@ class JumpFR<bits<8> op, string instrAsm, RegisterClass regClass>
 }
 
 let isCall=1, hasDelaySlot=1 in {
-  //@JumpLink {
   class JumpLink<bits<8> op, string instr_asm>:
     FJ<op, (outs), (ins calltarget:$target, variable_ops),
        !strconcat(instr_asm, "\t$target"), [(Cpu0JmpLink imm:$target)],
        IIBranch> {
-//#if CH >= CH10_1 2
        let DecoderMethod = "DecodeJumpTarget";
-//#endif
        }
-  //@JumpLink }
 
   class JumpLinkReg<bits<8> op, string instr_asm,
                     RegisterClass RC>:
@@ -576,19 +571,19 @@ def NOR     : LogicNOR<0x1b, "nor", CPURegs>;
 // Shift Instructions
 
 // sra is IR node for ashr llvm IR instruction of .bc
-def ROL     : shift_rotate_imm32<0x1c, 0x01, "rol", rotl>;
-def ROR     : shift_rotate_imm32<0x1d, 0x01, "ror", rotr>;
+def ROL     : shift_rotate_imm32<0x1c, "rol", rotl>;
+def ROR     : shift_rotate_imm32<0x1d, "ror", rotr>;
 
-def SHL     : shift_rotate_imm32<0x1e, 0x00, "shl", shl>;
+def SHL     : shift_rotate_imm32<0x1e, "shl", shl>;
 
 // srl is IR node for lshr llvm IR instruction of .bc
-def SHR     : shift_rotate_imm32<0x1f, 0x00, "shr", srl>;
-def SRA     : shift_rotate_imm32<0x20, 0x00, "sra", sra>;
-def SRAV    : shift_rotate_reg<0x21, 0x00, "srav", sra, CPURegs>;
-def SHLV    : shift_rotate_reg<0x22, 0x00, "shlv", shl, CPURegs>;
-def SHRV    : shift_rotate_reg<0x23, 0x00, "shrv", srl, CPURegs>;
-def ROLV    : shift_rotate_reg<0x24, 0x01, "rolv", rotl, CPURegs>;
-def RORV    : shift_rotate_reg<0x25, 0x01, "rorv", rotr, CPURegs>;
+def SHR     : shift_rotate_imm32<0x1f, "shr", srl>;
+def SRA     : shift_rotate_imm32<0x20, "sra", sra>;
+def SRAV    : shift_rotate_reg<0x21, "srav", sra, CPURegs>;
+def SHLV    : shift_rotate_reg<0x22, "shlv", shl, CPURegs>;
+def SHRV    : shift_rotate_reg<0x23, "shrv", srl, CPURegs>;
+def ROLV    : shift_rotate_reg<0x24, "rolv", rotl, CPURegs>;
+def RORV    : shift_rotate_reg<0x25, "rorv", rotr, CPURegs>;
 
 let Predicates = [HasSlt] in {
 def SLTi    : SetCC_I<0x26, "slti", setlt, simm16, immSExt16, CPURegs>;
@@ -600,12 +595,12 @@ def SLTu    : SetCC_R<0x29, "sltu", setult, CPURegs>;
 // Jump Instructions
 
 let Predicates = [HasCmp] in {
-def JEQ     : CBranch24<0x30, "jeq", SR, [SW]>;
-def JNE     : CBranch24<0x31, "jne", SR, [SW]>;
-def JLT     : CBranch24<0x32, "jlt", SR, [SW]>;
-def JGT     : CBranch24<0x33, "jgt", SR, [SW]>;
-def JLE     : CBranch24<0x34, "jle", SR, [SW]>;
-def JGE     : CBranch24<0x35, "jge", SR, [SW]>;
+def JEQ     : CBranch24<0x30, "jeq", SR>;
+def JNE     : CBranch24<0x31, "jne", SR>;
+def JLT     : CBranch24<0x32, "jlt", SR>;
+def JGT     : CBranch24<0x33, "jgt", SR>;
+def JLE     : CBranch24<0x34, "jle", SR>;
+def JGE     : CBranch24<0x35, "jge", SR>;
 }
 
 let Predicates = [HasSlt] in {
@@ -767,8 +762,7 @@ def : Pat<(brcond RC:$cond, bb:$dst),
 
 // brcond for slt instruction
 multiclass BrcondPatsSlt<RegisterClass RC, Instruction BEQOp, Instruction BNEOp,
-                      Instruction SLTOp, Instruction SLTuOp, Instruction SLTiOp,
-                      Instruction SLTiuOp, Register ZEROReg> {
+                      Instruction SLTOp, Instruction SLTuOp, Register ZEROReg> {
 def : Pat<(brcond (i32 (setne RC:$lhs, 0)), bb:$dst),
               (BNEOp RC:$lhs, ZEROReg, bb:$dst)>;
 def : Pat<(brcond (i32 (seteq RC:$lhs, 0)), bb:$dst),
@@ -804,7 +798,7 @@ def : Pat<(brcond RC:$cond, bb:$dst),
 }
 
 let Predicates = [HasSlt] in {
-defm : BrcondPatsSlt<CPURegs, BEQ, BNE, SLT, SLTu, SLTi, SLTiu, ZERO>;
+defm : BrcondPatsSlt<CPURegs, BEQ, BNE, SLT, SLTu, ZERO>;
 }
 
 let Predicates = [HasCmp] in {

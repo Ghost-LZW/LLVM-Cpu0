@@ -41,14 +41,6 @@ using namespace llvm;
 Cpu0RegisterInfo::Cpu0RegisterInfo(const Cpu0Subtarget &ST)
     : Cpu0GenRegisterInfo(Cpu0::LR), Subtarget(ST) {}
 
-#if 0
-const TargetRegisterClass *
-Cpu0RegisterInfo::getPointerRegClass(const MachineFunction &MF,
-                                     unsigned Kind) const {
-  return &Cpu0::CPURegsRegClass;
-}
-#endif
-
 //===----------------------------------------------------------------------===//
 // Callee Saved Registers methods
 //===----------------------------------------------------------------------===//
@@ -79,13 +71,6 @@ BitVector Cpu0RegisterInfo::getReservedRegs(const MachineFunction &MF) const {
   for (unsigned I = 0; I < array_lengthof(ReservedCPURegs); ++I)
     Reserved.set(ReservedCPURegs[I]);
 
-#if 0 // CH >= CH9_3 //2
-  // Reserve FP if this function should have a dedicated frame pointer register.
-  if (MF.getSubtarget().getFrameLowering()->hasFP(MF)) {
-    Reserved.set(Cpu0::FP);
-  }
-#endif
-
 #ifdef ENABLE_GPRESTORE // 1
   const Cpu0FunctionInfo *Cpu0FI = MF.getInfo<Cpu0FunctionInfo>();
   // Reserve GP if globalBaseRegFixed()
@@ -108,7 +93,6 @@ void Cpu0RegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator II,
   MachineInstr &MI = *II;
   MachineFunction &MF = *MI.getParent()->getParent();
   MachineFrameInfo &MFI = MF.getFrameInfo();
-  Cpu0FunctionInfo *Cpu0FI = MF.getInfo<Cpu0FunctionInfo>();
 
   unsigned i = 0;
   while (!MI.getOperand(i).isFI()) {
@@ -129,13 +113,6 @@ void Cpu0RegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator II,
                     << "stackSize  : " << stackSize << "\n");
 
   const std::vector<CalleeSavedInfo> &CSI = MFI.getCalleeSavedInfo();
-  int MinCSFI = 0;
-  int MaxCSFI = -1;
-
-  if (CSI.size()) {
-    MinCSFI = CSI[0].getFrameIdx();
-    MaxCSFI = CSI[CSI.size() - 1].getFrameIdx();
-  }
 
   // The following stack frame objects are always referenced relative to $sp:
   //  1. Outgoing arguments.
@@ -145,15 +122,7 @@ void Cpu0RegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator II,
   // getFrameRegister() returns.
   unsigned FrameReg;
 
-#if 0 // CH >= CH9_3 // 3
-  if (Cpu0FI->isOutArgFI(FrameIndex) || Cpu0FI->isDynAllocFI(FrameIndex) ||
-      (FrameIndex >= MinCSFI && FrameIndex <= MaxCSFI))
-    FrameReg = Cpu0::SP;
-  else
-    FrameReg = getFrameRegister(MF);
-#else
   FrameReg = Cpu0::SP;
-#endif //#if CH >= CH9_3 //3
 
   // Calculate final offset.
   // - There is no need to change the offset if the frame object is one of the
@@ -163,14 +132,6 @@ void Cpu0RegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator II,
   //   by adding the size of the stack:
   //   incoming argument, callee-saved register location or local variable.
   int64_t Offset;
-#if 0                   // CH >= CH9_3 //1
-#ifdef ENABLE_GPRESTORE // 2
-  if (Cpu0FI->isOutArgFI(FrameIndex) || Cpu0FI->isGPFI(FrameIndex) ||
-      Cpu0FI->isDynAllocFI(FrameIndex))
-    Offset = spOffset;
-  else
-#endif
-#endif //#if CH >= CH9_3 //1
   Offset = spOffset + (int64_t)stackSize;
 
   Offset += MI.getOperand(i + 1).getImm();

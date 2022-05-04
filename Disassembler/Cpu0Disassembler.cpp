@@ -86,8 +86,8 @@ static DecodeStatus DecodeBranch16Target(MCInst &Inst, unsigned Insn,
                                          uint64_t Address, const void *Decoder);
 static DecodeStatus DecodeBranch24Target(MCInst &Inst, unsigned Insn,
                                          uint64_t Address, const void *Decoder);
-static DecodeStatus DecodeJumpTarget(MCInst &Inst, unsigned Insn,
-                                     uint64_t Address, const void *Decoder);
+/*static DecodeStatus DecodeJumpTarget(MCInst &Inst, unsigned Insn,
+                                     uint64_t Address, const void *Decoder);*/
 static DecodeStatus DecodeJumpFR(MCInst &Inst, unsigned Insn, uint64_t Address,
                                  const void *Decoder);
 
@@ -206,12 +206,6 @@ static DecodeStatus DecodeMem(MCInst &Inst, unsigned Insn, uint64_t Address,
   int Reg = (int)fieldFromInstruction(Insn, 20, 4);
   int Base = (int)fieldFromInstruction(Insn, 16, 4);
 
-#if 0 // CH >= CH12_1 //1
-  if(Inst.getOpcode() == Cpu0::SC){
-    Inst.addOperand(MCOperand::createReg(Reg));
-  }
-#endif
-
   Inst.addOperand(MCOperand::createReg(CPURegsTable[Reg]));
   Inst.addOperand(MCOperand::createReg(CPURegsTable[Base]));
   Inst.addOperand(MCOperand::createImm(Offset));
@@ -259,13 +253,13 @@ static DecodeStatus DecodeBranch24Target(MCInst &Inst, unsigned Insn,
   return MCDisassembler::Success;
 }
 
-static DecodeStatus DecodeJumpTarget(MCInst &Inst, unsigned Insn,
+/*static DecodeStatus DecodeJumpTarget(MCInst &Inst, unsigned Insn,
                                      uint64_t Address, const void *Decoder) {
 
   unsigned JumpOffset = fieldFromInstruction(Insn, 0, 24);
   Inst.addOperand(MCOperand::createImm(JumpOffset));
   return MCDisassembler::Success;
-}
+}*/
 
 static DecodeStatus DecodeJumpFR(MCInst &Inst, unsigned Insn, uint64_t Address,
                                  const void *Decoder) {

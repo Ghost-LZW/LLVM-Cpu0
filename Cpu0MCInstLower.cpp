@@ -49,11 +49,6 @@ MCOperand Cpu0MCInstLower::LowerSymbolOperand(const MachineOperand &MO,
     TargetKind = Cpu0MCExpr::CEK_GPREL;
     break;
 
-#if 0 // CH >= CH9_1 // 1
-  case Cpu0II::MO_GOT_CALL:
-    TargetKind = Cpu0MCExpr::CEK_GOT_CALL;
-    break;
-#endif
   case Cpu0II::MO_GOT:
     TargetKind = Cpu0MCExpr::CEK_GOT;
     break;
@@ -65,29 +60,6 @@ MCOperand Cpu0MCInstLower::LowerSymbolOperand(const MachineOperand &MO,
   case Cpu0II::MO_ABS_LO:
     TargetKind = Cpu0MCExpr::CEK_ABS_LO;
     break;
-#if 0 // CH >= CH12_1
-  case Cpu0II::MO_TLSGD:
-    TargetKind = Cpu0MCExpr::CEK_TLSGD;
-    break;
-  case Cpu0II::MO_TLSLDM:
-    TargetKind = Cpu0MCExpr::CEK_TLSLDM;
-    break;
-  case Cpu0II::MO_DTP_HI:
-    TargetKind = Cpu0MCExpr::CEK_DTP_HI;
-    break;
-  case Cpu0II::MO_DTP_LO:
-    TargetKind = Cpu0MCExpr::CEK_DTP_LO;
-    break;
-  case Cpu0II::MO_GOTTPREL:
-    TargetKind = Cpu0MCExpr::CEK_GOTTPREL;
-    break;
-  case Cpu0II::MO_TP_HI:
-    TargetKind = Cpu0MCExpr::CEK_TP_HI;
-    break;
-  case Cpu0II::MO_TP_LO:
-    TargetKind = Cpu0MCExpr::CEK_TP_LO;
-    break;
-#endif
   case Cpu0II::MO_GOT_HI16:
     TargetKind = Cpu0MCExpr::CEK_GOT_HI16;
     break;
@@ -110,13 +82,6 @@ MCOperand Cpu0MCInstLower::LowerSymbolOperand(const MachineOperand &MO,
     Symbol = AsmPrinter.GetBlockAddressSymbol(MO.getBlockAddress());
     Offset += MO.getOffset();
     break;
-
-#if 0 // CH >= CH9_1 // 2
-  case MachineOperand::MO_ExternalSymbol:
-    Symbol = AsmPrinter.GetExternalSymbolSymbol(MO.getSymbolName());
-    Offset += MO.getOffset();
-    break;
-#endif
 
   case MachineOperand::MO_JumpTableIndex:
     Symbol = AsmPrinter.GetJTISymbol(MO.getIndex());
@@ -174,38 +139,6 @@ void Cpu0MCInstLower::LowerCPLOAD(SmallVector<MCInst, 4> &MCInsts) {
   CreateMCInst(MCInsts[2], Cpu0::ADD, GPReg, GPReg, T9Reg);
 }
 
-#if 0 // CH >= CH9_3
-#ifdef ENABLE_GPRESTORE
-// Lower ".cprestore offset" to "st $gp, offset($sp)".
-void Cpu0MCInstLower::LowerCPRESTORE(int64_t Offset,
-                                     SmallVector<MCInst, 4>& MCInsts) {
-  assert(isInt<32>(Offset) && (Offset >= 0) &&
-         "Imm operand of .cprestore must be a non-negative 32-bit value.");
-
-  MCOperand SPReg = MCOperand::createReg(Cpu0::SP), BaseReg = SPReg;
-  MCOperand GPReg = MCOperand::createReg(Cpu0::GP);
-  MCOperand ZEROReg = MCOperand::createReg(Cpu0::ZERO);
-
-  if (!isInt<16>(Offset)) {
-    unsigned Hi = ((Offset + 0x8000) >> 16) & 0xffff;
-    Offset &= 0xffff;
-    MCOperand ATReg = MCOperand::createReg(Cpu0::AT);
-    BaseReg = ATReg;
-
-    // lui   at,hi
-    // add   at,at,sp
-    MCInsts.resize(2);
-    CreateMCInst(MCInsts[0], Cpu0::LUi, ATReg, ZEROReg, MCOperand::createImm(Hi));
-    CreateMCInst(MCInsts[1], Cpu0::ADD, ATReg, ATReg, SPReg);
-  }
-
-  MCInst St;
-  CreateMCInst(St, Cpu0::ST, GPReg, BaseReg, MCOperand::createImm(Offset));
-  MCInsts.push_back(St);
-}
-#endif
-#endif //#if CH >= CH9_3
-
 //@LowerOperand {
 MCOperand Cpu0MCInstLower::LowerOperand(const MachineOperand &MO,
                                         int64_t offset) const {
@@ -223,9 +156,6 @@ MCOperand Cpu0MCInstLower::LowerOperand(const MachineOperand &MO,
   case MachineOperand::MO_Immediate:
     return MCOperand::createImm(MO.getImm() + offset);
   case MachineOperand::MO_MachineBasicBlock:
-#if 0 // CH >= CH9_1 //3
-  case MachineOperand::MO_ExternalSymbol:
-#endif
   case MachineOperand::MO_JumpTableIndex:
   case MachineOperand::MO_BlockAddress:
   case MachineOperand::MO_GlobalAddress:

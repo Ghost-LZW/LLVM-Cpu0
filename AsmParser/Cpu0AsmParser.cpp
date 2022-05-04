@@ -1,11 +1,8 @@
-//===-- Cpu0AsmParser.cpp - Parse Cpu0 assembly to MCInst instructions ----===//
+// Copyright 2022 All Rights Reserved.
+// Author: lanzongwei541@gmail.com (lanzongwei)
 //
-//                     The LLVM Compiler Infrastructure
-//
-// This file is distributed under the University of Illinois Open Source
-// License. See LICENSE.TXT for details.
-//
-//===----------------------------------------------------------------------===//
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
 #include "Cpu0.h"
 

@@ -127,7 +127,7 @@ static MCTargetStreamer *createCpu0AsmTargetStreamer(MCStreamer &S,
                                                      formatted_raw_ostream &OS,
                                                      MCInstPrinter *InstPrint,
                                                      bool isVerboseAsm) {
-  return new Cpu0TargetAsmStreamer(S, OS);
+  return new Cpu0TargetAsmStreamer(S);
 }
 
 extern "C" void LLVMInitializeCpu0TargetMC() {
