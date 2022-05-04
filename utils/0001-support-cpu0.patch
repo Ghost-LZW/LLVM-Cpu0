@@ -1,4 +1,4 @@
-From 76f045aed726003014f8ba8ca1873f6a8b89494d Mon Sep 17 00:00:00 2001
+From b7e09cada13480242c6c4244e20605dcb913c8ba Mon Sep 17 00:00:00 2001
 From: lanzongwei <Ghost-lzw>
 Date: Sun, 1 May 2022 22:06:59 +0800
 Subject: [PATCH] support cpu0
@@ -15,10 +15,10 @@ Subject: [PATCH] support cpu0
  create mode 100644 llvm/include/llvm/BinaryFormat/ELFRelocs/Cpu0.def
 
 diff --git a/llvm/CMakeLists.txt b/llvm/CMakeLists.txt
-index 5e786b712051..10b4738ad1d7 100644
+index ced538f0d7cf..c0a19f409119 100644
 --- a/llvm/CMakeLists.txt
 +++ b/llvm/CMakeLists.txt
-@@ -353,6 +353,7 @@ set(LLVM_ALL_TARGETS
+@@ -360,6 +360,7 @@ set(LLVM_ALL_TARGETS
    WebAssembly
    X86
    XCore
@@ -42,7 +42,7 @@ index e140331b2b86..a94d380eea4c 100644
    enum SubArchType {
      NoSubArch,
 diff --git a/llvm/include/llvm/BinaryFormat/ELF.h b/llvm/include/llvm/BinaryFormat/ELF.h
-index 74bb3205807f..519aa1c5bb4b 100644
+index 2e926856fda5..ac6c99b5108b 100644
 --- a/llvm/include/llvm/BinaryFormat/ELF.h
 +++ b/llvm/include/llvm/BinaryFormat/ELF.h
 @@ -320,6 +320,7 @@ enum {
@@ -53,7 +53,7 @@ index 74bb3205807f..519aa1c5bb4b 100644
  };
  
  // Object file classes.
-@@ -894,6 +895,19 @@ enum {
+@@ -896,6 +897,19 @@ enum {
  #include "ELFRelocs/LoongArch.def"
  };
  
@@ -230,5 +230,5 @@ index 4aacad40c05e..9a0e7b68a2b6 100644
      break;
  
 -- 
-2.35.1
+2.36.0
 
