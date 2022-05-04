@@ -40,9 +40,7 @@ public:
   bool runOnMachineFunction(MachineFunction &MF) override;
 
 protected:
-#if 0 // CH >= CH6_1 //1
   SDNode *getGlobalBaseReg();
-#endif
 
   /// Keep a pointer to the Cpu0Subtarget around so that we can make the right
   /// decision when generating code for different targets.

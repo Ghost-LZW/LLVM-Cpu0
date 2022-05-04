@@ -18,21 +18,60 @@
 #include "Cpu0TargetMachine.h"
 #include "Cpu0TargetObjectFile.h"
 #include "MCTargetDesc/Cpu0BaseInfo.h"
+
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/Statistic.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/StringSwitch.h"
 #include "llvm/CodeGen/CallingConvLower.h"
+#include "llvm/CodeGen/FunctionLoweringInfo.h"
+#include "llvm/CodeGen/ISDOpcodes.h"
+#include "llvm/CodeGen/MachineBasicBlock.h"
 #include "llvm/CodeGen/MachineFrameInfo.h"
 #include "llvm/CodeGen/MachineFunction.h"
+#include "llvm/CodeGen/MachineInstr.h"
 #include "llvm/CodeGen/MachineInstrBuilder.h"
+#include "llvm/CodeGen/MachineJumpTableInfo.h"
+#include "llvm/CodeGen/MachineMemOperand.h"
+#include "llvm/CodeGen/MachineOperand.h"
 #include "llvm/CodeGen/MachineRegisterInfo.h"
+#include "llvm/CodeGen/RuntimeLibcalls.h"
 #include "llvm/CodeGen/SelectionDAG.h"
+#include "llvm/CodeGen/SelectionDAGNodes.h"
+#include "llvm/CodeGen/TargetFrameLowering.h"
+#include "llvm/CodeGen/TargetInstrInfo.h"
+#include "llvm/CodeGen/TargetRegisterInfo.h"
 #include "llvm/CodeGen/ValueTypes.h"
 #include "llvm/IR/CallingConv.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/DebugLoc.h"
 #include "llvm/IR/DerivedTypes.h"
-#include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
+#include "llvm/MC/MCContext.h"
+#include "llvm/MC/MCRegisterInfo.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/CodeGen.h"
 #include "llvm/Support/CommandLine.h"
-#include "llvm/Support/Debug.h"
+#include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
-#include "llvm/Support/raw_ostream.h"
+#include "llvm/Support/MachineValueType.h"
+#include "llvm/Support/MathExtras.h"
+#include "llvm/Target/TargetMachine.h"
+#include "llvm/Target/TargetOptions.h"
+#include <algorithm>
+#include <cassert>
+#include <cctype>
+#include <cstdint>
+#include <deque>
+#include <iterator>
+#include <utility>
+#include <vector>
 
 using namespace llvm;
 
@@ -42,7 +81,6 @@ using namespace llvm;
 STATISTIC(NumTailCalls, "Number of tail calls");
 #endif
 
-#if 0 // H >= CH6_1 //1
 SDValue Cpu0TargetLowering::getGlobalReg(SelectionDAG &DAG, EVT Ty) const {
   Cpu0FunctionInfo *FI = DAG.getMachineFunction().getInfo<Cpu0FunctionInfo>();
   return DAG.getRegister(FI->getGlobalBaseReg(), Ty);
@@ -61,7 +99,6 @@ SDValue Cpu0TargetLowering::getTargetNode(ExternalSymbolSDNode *N, EVT Ty,
                                           unsigned Flag) const {
   return DAG.getTargetExternalSymbol(N->getSymbol(), Ty, Flag);
 }
-#endif
 
 #if 0 // H >= CH8_1 //1
 SDValue Cpu0TargetLowering::getTargetNode(BlockAddressSDNode *N, EVT Ty,
@@ -135,9 +172,7 @@ Cpu0TargetLowering::Cpu0TargetLowering(const Cpu0TargetMachine &TM,
 #endif
 
   // Cpu0 Custom Operations
-#if 0 // H >= CH6_1 //2
-  setOperationAction(ISD::GlobalAddress,      MVT::i32,   Custom);
-#endif
+  setOperationAction(ISD::GlobalAddress, MVT::i32, Custom);
 #if 0 // H >= CH12_1 //1
   setOperationAction(ISD::GlobalTLSAddress,   MVT::i32,   Custom);
 #endif
@@ -302,17 +337,15 @@ SDValue Cpu0TargetLowering::PerformDAGCombine(SDNode *N,
   return SDValue();
 }
 
-#if 0  // H >= CH6_1 //3
-SDValue Cpu0TargetLowering::
-LowerOperation(SDValue Op, SelectionDAG &DAG) const
-{
-  switch (Op.getOpcode())
-  {
+SDValue Cpu0TargetLowering::LowerOperation(SDValue Op,
+                                           SelectionDAG &DAG) const {
+  switch (Op.getOpcode()) {
 #if 0  // H >= CH8_1 //6
   case ISD::BRCOND:             return lowerBRCOND(Op, DAG);
 #endif //#if CH >= CH8_1
-  case ISD::GlobalAddress:      return lowerGlobalAddress(Op, DAG);
-#if 0  // H >= CH12_1 //3
+  case ISD::GlobalAddress:
+    return lowerGlobalAddress(Op, DAG);
+#if 0 // H >= CH12_1 //3
   case ISD::GlobalTLSAddress:   return lowerGlobalTLSAddress(Op, DAG);
 #endif
 #if 0 // H >= CH8_1 //7
@@ -337,7 +370,6 @@ LowerOperation(SDValue Op, SelectionDAG &DAG) const
   }
   return SDValue();
 }
-#endif
 
 //===----------------------------------------------------------------------===//
 //  Lower helper functions
@@ -918,14 +950,12 @@ lowerSELECT(SDValue Op, SelectionDAG &DAG) const
 }
 #endif
 
-#if 0 // H >= CH6_1 //4
 SDValue Cpu0TargetLowering::lowerGlobalAddress(SDValue Op,
                                                SelectionDAG &DAG) const {
   //@lowerGlobalAddress }
   SDLoc DL(Op);
-  const Cpu0TargetObjectFile *TLOF =
-        static_cast<const Cpu0TargetObjectFile *>(
-            getTargetMachine().getObjFileLowering());
+  const Cpu0TargetObjectFile *TLOF = static_cast<const Cpu0TargetObjectFile *>(
+      getTargetMachine().getObjFileLowering());
   //@lga 1 {
   EVT Ty = Op.getValueType();
   GlobalAddressSDNode *N = cast<GlobalAddressSDNode>(Op);
@@ -934,12 +964,12 @@ SDValue Cpu0TargetLowering::lowerGlobalAddress(SDValue Op,
 
   if (!isPositionIndependent()) {
     //@ %gp_rel relocation
-    const GlobalObject *GO = GV->getBaseObject();
+    const GlobalObject *GO = GV->getAliaseeObject();
     if (GO && TLOF->IsGlobalInSmallSection(GO, getTargetMachine())) {
-      SDValue GA = DAG.getTargetGlobalAddress(GV, DL, MVT::i32, 0,
-                                              Cpu0II::MO_GPREL);
-      SDValue GPRelNode = DAG.getNode(Cpu0ISD::GPRel, DL,
-                                      DAG.getVTList(MVT::i32), GA);
+      SDValue GA =
+          DAG.getTargetGlobalAddress(GV, DL, MVT::i32, 0, Cpu0II::MO_GPREL);
+      SDValue GPRelNode =
+          DAG.getNode(Cpu0ISD::GPRel, DL, DAG.getVTList(MVT::i32), GA);
       SDValue GPReg = DAG.getRegister(Cpu0::GP, MVT::i32);
       return DAG.getNode(ISD::ADD, DL, MVT::i32, GPReg, GPRelNode);
     }
@@ -952,17 +982,15 @@ SDValue Cpu0TargetLowering::lowerGlobalAddress(SDValue Op,
     return getAddrLocal(N, Ty, DAG);
 
   //@large section
-  const GlobalObject *GO = GV->getBaseObject();
+  const GlobalObject *GO = GV->getAliaseeObject();
   if (GO && !TLOF->IsGlobalInSmallSection(GO, getTargetMachine()))
     return getAddrGlobalLargeGOT(
-        N, Ty, DAG, Cpu0II::MO_GOT_HI16, Cpu0II::MO_GOT_LO16, 
-        DAG.getEntryNode(), 
+        N, Ty, DAG, Cpu0II::MO_GOT_HI16, Cpu0II::MO_GOT_LO16,
+        DAG.getEntryNode(),
         MachinePointerInfo::getGOT(DAG.getMachineFunction()));
-  return getAddrGlobal(
-      N, Ty, DAG, Cpu0II::MO_GOT, DAG.getEntryNode(), 
-      MachinePointerInfo::getGOT(DAG.getMachineFunction()));
+  return getAddrGlobal(N, Ty, DAG, Cpu0II::MO_GOT, DAG.getEntryNode(),
+                       MachinePointerInfo::getGOT(DAG.getMachineFunction()));
 }
-#endif
 
 #if 0 // H >= CH12_1 //4
 SDValue Cpu0TargetLowering::

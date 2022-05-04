@@ -21,19 +21,13 @@ bool FixGlobalBaseReg;
 
 Cpu0FunctionInfo::~Cpu0FunctionInfo() {}
 
-#if 0 // CH >= CH6_1
-bool Cpu0FunctionInfo::globalBaseRegFixed() const {
-  return FixGlobalBaseReg;
-}
+bool Cpu0FunctionInfo::globalBaseRegFixed() const { return FixGlobalBaseReg; }
 
-bool Cpu0FunctionInfo::globalBaseRegSet() const {
-  return GlobalBaseReg;
-}
+bool Cpu0FunctionInfo::globalBaseRegSet() const { return GlobalBaseReg; }
 
 unsigned Cpu0FunctionInfo::getGlobalBaseReg() {
   return GlobalBaseReg = Cpu0::GP;
 }
-#endif
 
 void Cpu0FunctionInfo::createEhDataRegsFI() {
   const TargetRegisterInfo &TRI = *MF.getSubtarget().getRegisterInfo();

@@ -52,16 +52,15 @@ bool Cpu0DAGToDAGISel::runOnMachineFunction(MachineFunction &MF) {
   return Ret;
 }
 
-#if 0 // CH >= CH6_1 //1
 /// getGlobalBaseReg - Output the instructions required to put the
 /// GOT address into a register.
 SDNode *Cpu0DAGToDAGISel::getGlobalBaseReg() {
   unsigned GlobalBaseReg = MF->getInfo<Cpu0FunctionInfo>()->getGlobalBaseReg();
-  return CurDAG->getRegister(GlobalBaseReg, getTargetLowering()->getPointerTy(
-                                                CurDAG->getDataLayout()))
+  return CurDAG
+      ->getRegister(GlobalBaseReg,
+                    getTargetLowering()->getPointerTy(CurDAG->getDataLayout()))
       .getNode();
 }
-#endif
 
 /// ComplexPattern used on Cpu0InstrInfo
 /// Used on Cpu0 Load/Store instructions
@@ -91,10 +90,9 @@ bool Cpu0DAGToDAGISel::selectAddr(SDNode *Parent, SDValue Addr, SDValue &Base,
     return true;
   }
 
-#if 0 // CH >= CH6_1 //2
   // on PIC code Load GA
   if (Addr.getOpcode() == Cpu0ISD::Wrapper) {
-    Base   = Addr.getOperand(0);
+    Base = Addr.getOperand(0);
     Offset = Addr.getOperand(1);
     return true;
   }
@@ -102,10 +100,9 @@ bool Cpu0DAGToDAGISel::selectAddr(SDNode *Parent, SDValue Addr, SDValue &Base,
   //@static
   if (TM.getRelocationModel() != Reloc::PIC_) {
     if ((Addr.getOpcode() == ISD::TargetExternalSymbol ||
-        Addr.getOpcode() == ISD::TargetGlobalAddress))
+         Addr.getOpcode() == ISD::TargetGlobalAddress))
       return false;
   }
-#endif
 
 #if 0 // CH >= CH7_1 //1
   // Addresses of the form FI+const or FI|const
@@ -153,12 +150,10 @@ void Cpu0DAGToDAGISel::Select(SDNode *Node) {
   default:
     break;
 
-#if 0 // CH >= CH6_1 //3
   // Get target GOT address.
   case ISD::GLOBAL_OFFSET_TABLE:
     ReplaceNode(Node, getGlobalBaseReg());
     return;
-#endif
   }
 
   // Select the default instruction

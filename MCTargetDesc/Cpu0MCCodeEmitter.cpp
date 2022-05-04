@@ -190,10 +190,6 @@ unsigned Cpu0MCCodeEmitter::getExprOpValue(const MCExpr *Expr,
     switch (Cpu0Expr->getKind()) {
     default:
       llvm_unreachable("Unsupported fixup kind for target expression!");
-#if 0 // CH >= CH6_1
-  //@switch {
-//    switch(cast<MCSymbolRefExpr>(Expr)->getKind()) {
-  //@switch }
     case Cpu0MCExpr::CEK_GPREL:
       FixupKind = Cpu0::fixup_Cpu0_GPREL16;
       break;
@@ -240,8 +236,7 @@ unsigned Cpu0MCCodeEmitter::getExprOpValue(const MCExpr *Expr,
     case Cpu0MCExpr::CEK_GOT_LO16:
       FixupKind = Cpu0::fixup_Cpu0_GOT_LO16;
       break;
-#endif // #if CH >= CH6_1
-    }  // switch
+    } // switch
     Fixups.push_back(MCFixup::create(0, Expr, MCFixupKind(FixupKind)));
     return 0;
   }

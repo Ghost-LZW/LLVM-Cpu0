@@ -27,10 +27,7 @@ class Cpu0FunctionInfo : public MachineFunctionInfo {
 public:
   Cpu0FunctionInfo(MachineFunction &MF)
       : MF(MF), VarArgsFrameIndex(0), SRetReturnReg(0), CallsEhReturn(false),
-        CallsEhDwarf(false),
-#if 0 // CH >= CH6_1 //1
-    GlobalBaseReg(0),
-#endif
+        CallsEhDwarf(false), GlobalBaseReg(0),
 #if 0 // CH >= CH9_1 //1
     InArgFIRange(std::make_pair(-1, 0)),
     OutArgFIRange(std::make_pair(-1, 0)), GPFI(0), DynAllocFI(0),
@@ -66,11 +63,9 @@ public:
   unsigned getSRetReturnReg() const { return SRetReturnReg; }
   void setSRetReturnReg(unsigned Reg) { SRetReturnReg = Reg; }
 
-#if 0 // CH >= CH6_1 //2
   bool globalBaseRegFixed() const;
   bool globalBaseRegSet() const;
   unsigned getGlobalBaseReg();
-#endif
 
   int getVarArgsFrameIndex() const { return VarArgsFrameIndex; }
   void setVarArgsFrameIndex(int Index) { VarArgsFrameIndex = Index; }
@@ -135,12 +130,10 @@ private:
   /// Frame objects for spilling eh data registers.
   int EhDataRegFI[2];
 
-#if 0 // CH >= CH6_1 //3
   /// GlobalBaseReg - keeps track of the virtual register initialized for
   /// use as the global base register. This is used for PIC in some PIC
   /// relocation models.
   unsigned GlobalBaseReg;
-#endif
 
 #if 0 // CH >= CH9_1 //4
   // Range of frame object indices.
@@ -151,10 +144,8 @@ private:
   std::pair<int, int> InArgFIRange, OutArgFIRange;
 #endif
 
-#if 0 // CH >= CH6_1 //4
   int GPFI; // Index of the frame object for restoring $gp
-#endif
-#if 0 // CH >= CH9_1 //5
+#if 0       // CH >= CH9_1 //5
   mutable int DynAllocFI; // Frame index of dynamically allocated stack area.
 #endif
   bool EmitNOAT;

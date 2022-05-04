@@ -32,11 +32,9 @@ enum TOF {
 
   MO_NO_FLAG,
 
-#if 0 // CH >= CH6_1
-    /// MO_GOT - Represents the offset into the global offset table at which
-    /// the address the relocation entry symbol resides during execution.
-    MO_GOT,
-#endif
+  /// MO_GOT - Represents the offset into the global offset table at which
+  /// the address the relocation entry symbol resides during execution.
+  MO_GOT,
 
   /// MO_GOT_CALL - Represents the offset into the global offset table at
   /// which the address of a call site relocation entry symbol resides

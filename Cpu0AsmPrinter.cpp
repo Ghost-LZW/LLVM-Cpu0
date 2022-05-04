@@ -306,13 +306,10 @@ void Cpu0AsmPrinter::emitFunctionBodyStart() {
   MCInstLowering.Initialize(&MF->getContext());
 
   emitFrameDirective();
-#if 0 // CH >= CH6_1 //1
   bool EmitCPLoad = (MF->getTarget().getRelocationModel() == Reloc::PIC_) &&
-    Cpu0FI->globalBaseRegSet() &&
-    Cpu0FI->globalBaseRegFixed();
+                    Cpu0FI->globalBaseRegSet() && Cpu0FI->globalBaseRegFixed();
   if (Cpu0NoCpload)
     EmitCPLoad = false;
-#endif
 
   if (OutStreamer->hasRawTextSupport()) {
     SmallString<128> Str;
@@ -320,22 +317,18 @@ void Cpu0AsmPrinter::emitFunctionBodyStart() {
     printSavedRegsBitmask(OS);
     OutStreamer->emitRawText(OS.str());
     OutStreamer->emitRawText(StringRef("\t.set\tnoreorder"));
-#if 0 // CH >= CH6_1 //2
     // Emit .cpload directive if needed.
     if (EmitCPLoad)
       OutStreamer->emitRawText(StringRef("\t.cpload\t$t9"));
-#endif
     OutStreamer->emitRawText(StringRef("\t.set\tnomacro"));
     if (Cpu0FI->getEmitNOAT())
       OutStreamer->emitRawText(StringRef("\t.set\tnoat"));
-#if 0 // CH >= CH6_1 //3
   } else if (EmitCPLoad) {
     SmallVector<MCInst, 4> MCInsts;
     MCInstLowering.LowerCPLOAD(MCInsts);
     for (SmallVector<MCInst, 4>::iterator I = MCInsts.begin();
-       I != MCInsts.end(); ++I)
+         I != MCInsts.end(); ++I)
       OutStreamer->emitInstruction(*I, getSubtargetInfo());
-#endif
   }
 }
 
@@ -454,7 +447,9 @@ void Cpu0AsmPrinter::printOperand(const MachineInstr *MI, int opNum,
   case Cpu0II::MO_GOT_CALL:
     O << "%call16(";
     break;
-  // case Cpu0II::MO_GOT:      O << "%got(";    break;
+  case Cpu0II::MO_GOT:
+    O << "%got(";
+    break;
   case Cpu0II::MO_ABS_HI:
     O << "%hi(";
     break;

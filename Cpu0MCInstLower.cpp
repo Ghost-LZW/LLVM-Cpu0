@@ -30,8 +30,6 @@ Cpu0MCInstLower::Cpu0MCInstLower(Cpu0AsmPrinter &asmprinter)
 
 void Cpu0MCInstLower::Initialize(MCContext *C) { Ctx = C; }
 
-#if 0 // CH >= CH6_1 //1
-//@LowerSymbolOperand {
 MCOperand Cpu0MCInstLower::LowerSymbolOperand(const MachineOperand &MO,
                                               MachineOperandType MOTy,
                                               unsigned Offset) const {
@@ -39,18 +37,19 @@ MCOperand Cpu0MCInstLower::LowerSymbolOperand(const MachineOperand &MO,
   Cpu0MCExpr::Cpu0ExprKind TargetKind = Cpu0MCExpr::CEK_None;
   const MCSymbol *Symbol;
 
-  switch(MO.getTargetFlags()) {
-  default:                   llvm_unreachable("Invalid target flag!");
+  switch (MO.getTargetFlags()) {
+  default:
+    llvm_unreachable("Invalid target flag!");
   case Cpu0II::MO_NO_FLAG:
     break;
 
-// Cpu0_GPREL is for llc -march=cpu0 -relocation-model=static -cpu0-islinux-
-//  format=false (global var in .sdata).
+    // Cpu0_GPREL is for llc -march=cpu0 -relocation-model=static -cpu0-islinux-
+    //  format=false (global var in .sdata).
   case Cpu0II::MO_GPREL:
     TargetKind = Cpu0MCExpr::CEK_GPREL;
     break;
 
-#if CH >= CH9_1 // 1
+#if 0 // CH >= CH9_1 // 1
   case Cpu0II::MO_GOT_CALL:
     TargetKind = Cpu0MCExpr::CEK_GOT_CALL;
     break;
@@ -58,15 +57,15 @@ MCOperand Cpu0MCInstLower::LowerSymbolOperand(const MachineOperand &MO,
   case Cpu0II::MO_GOT:
     TargetKind = Cpu0MCExpr::CEK_GOT;
     break;
-// ABS_HI and ABS_LO is for llc -march=cpu0 -relocation-model=static (global 
-//  var in .data).
+    // ABS_HI and ABS_LO is for llc -march=cpu0 -relocation-model=static (global
+    //  var in .data).
   case Cpu0II::MO_ABS_HI:
     TargetKind = Cpu0MCExpr::CEK_ABS_HI;
     break;
   case Cpu0II::MO_ABS_LO:
     TargetKind = Cpu0MCExpr::CEK_ABS_LO;
     break;
-#if CH >= CH12_1
+#if 0 // CH >= CH12_1
   case Cpu0II::MO_TLSGD:
     TargetKind = Cpu0MCExpr::CEK_TLSGD;
     break;
@@ -103,7 +102,7 @@ MCOperand Cpu0MCInstLower::LowerSymbolOperand(const MachineOperand &MO,
     Offset += MO.getOffset();
     break;
 
-#if CH >= CH8_1
+#if 0 // CH >= CH8_1
   case MachineOperand::MO_MachineBasicBlock:
     Symbol = MO.getMBB()->getSymbol();
     break;
@@ -114,14 +113,14 @@ MCOperand Cpu0MCInstLower::LowerSymbolOperand(const MachineOperand &MO,
     break;
 #endif
 
-#if CH >= CH9_1 // 2
+#if 0 // CH >= CH9_1 // 2
   case MachineOperand::MO_ExternalSymbol:
     Symbol = AsmPrinter.GetExternalSymbolSymbol(MO.getSymbolName());
     Offset += MO.getOffset();
     break;
 #endif
 
-#if CH >= CH8_1
+#if 0 // CH >= CH8_1
   case MachineOperand::MO_JumpTableIndex:
     Symbol = AsmPrinter.GetJTISymbol(MO.getIndex());
     break;
@@ -144,29 +143,23 @@ MCOperand Cpu0MCInstLower::LowerSymbolOperand(const MachineOperand &MO,
     Expr = Cpu0MCExpr::create(TargetKind, Expr, *Ctx);
 
   return MCOperand::createExpr(Expr);
-
 }
-//@LowerSymbolOperand }
-#endif // if CH >= CH6_1 //1
 
-#if 0
-static void CreateMCInst(MCInst& Inst, unsigned Opc, const MCOperand& Opnd0,
-                         const MCOperand& Opnd1,
-                         const MCOperand& Opnd2 = MCOperand()) {
+static void CreateMCInst(MCInst &Inst, unsigned Opc, const MCOperand &Opnd0,
+                         const MCOperand &Opnd1,
+                         const MCOperand &Opnd2 = MCOperand()) {
   Inst.setOpcode(Opc);
   Inst.addOperand(Opnd0);
   Inst.addOperand(Opnd1);
   if (Opnd2.isValid())
     Inst.addOperand(Opnd2);
 }
-#endif
 
-#if 0 // CH >= CH6_1 //2
 // Lower ".cpload $reg" to
 //  "lui   $gp, %hi(_gp_disp)"
 //  "addiu $gp, $gp, %lo(_gp_disp)"
 //  "addu  $gp, $gp, $t9"
-void Cpu0MCInstLower::LowerCPLOAD(SmallVector<MCInst, 4>& MCInsts) {
+void Cpu0MCInstLower::LowerCPLOAD(SmallVector<MCInst, 4> &MCInsts) {
   MCOperand GPReg = MCOperand::createReg(Cpu0::GP);
   MCOperand T9Reg = MCOperand::createReg(Cpu0::T9);
   StringRef SymName("_gp_disp");
@@ -184,7 +177,6 @@ void Cpu0MCInstLower::LowerCPLOAD(SmallVector<MCInst, 4>& MCInsts) {
   CreateMCInst(MCInsts[1], Cpu0::ORi, GPReg, GPReg, SymLo);
   CreateMCInst(MCInsts[2], Cpu0::ADD, GPReg, GPReg, T9Reg);
 }
-#endif
 
 #if 0 // CH >= CH9_3
 #ifdef ENABLE_GPRESTORE
@@ -244,10 +236,8 @@ MCOperand Cpu0MCInstLower::LowerOperand(const MachineOperand &MO,
   case MachineOperand::MO_JumpTableIndex:
   case MachineOperand::MO_BlockAddress:
 #endif
-#if 0 // CH >= CH6_1 //3
   case MachineOperand::MO_GlobalAddress:
     return LowerSymbolOperand(MO, MOTy, offset);
-#endif
   case MachineOperand::MO_RegisterMask:
     break;
   }

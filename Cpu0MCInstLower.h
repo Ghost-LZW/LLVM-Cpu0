@@ -33,19 +33,15 @@ public:
   void Initialize(MCContext *C);
   void Lower(const MachineInstr *MI, MCInst &OutMI) const;
   MCOperand LowerOperand(const MachineOperand &MO, int64_t offset = 0) const;
-#if 0 // CH >= CH6_1 //1
-  void LowerCPLOAD(SmallVector<MCInst, 4>& MCInsts);
-#endif
+  void LowerCPLOAD(SmallVector<MCInst, 4> &MCInsts);
 #if 0 // CH >= CH9_3
 #ifdef ENABLE_GPRESTORE
   void LowerCPRESTORE(int64_t Offset, SmallVector<MCInst, 4>& MCInsts);
 #endif
 #endif //#if CH >= CH9_3
 private:
-#if 0 // CH >= CH6_1 //2
   MCOperand LowerSymbolOperand(const MachineOperand &MO,
                                MachineOperandType MOTy, unsigned Offset) const;
-#endif
 #if 0 // CH >= CH8_2 //1
   MCOperand createSub(MachineBasicBlock *BB1, MachineBasicBlock *BB2,
                       Cpu0MCExpr::Cpu0ExprKind Kind) const;
