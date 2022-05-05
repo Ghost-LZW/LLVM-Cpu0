@@ -112,8 +112,6 @@ void Cpu0RegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator II,
                     << "spOffset   : " << spOffset << "\n"
                     << "stackSize  : " << stackSize << "\n");
 
-  const std::vector<CalleeSavedInfo> &CSI = MFI.getCalleeSavedInfo();
-
   // The following stack frame objects are always referenced relative to $sp:
   //  1. Outgoing arguments.
   //  2. Pointer to dynamically allocated stack space.
